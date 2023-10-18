@@ -4,7 +4,7 @@ metadata:
   name: popcorn-springboot-base-plugin
   display-name: Spring Boot Base plugin
   description: Plugin base para construção de APIs REST com Spring Boot
-  version: 0.0.1
+  version: 0.0.2
   picture: plugin.png
 spec:
   type: app
