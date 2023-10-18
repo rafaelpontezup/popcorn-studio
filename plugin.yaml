@@ -27,11 +27,13 @@ spec:
       name: project_group_id
       type: text
       required: true
+      pattern: '(^[a-zA-Z_\d.]*[a-zA-Z_\d]$)'
       default: "br.com.zup.popcornstudio"
     - label: Artifact_Id do Maven
       name: project_artifact_id
       type: text
       required: true
+      pattern: ^[a-z]([a-z0-9]|_)*$
     - label: Versão do Spring Boot
       name: project_springboot_version
       type: text
