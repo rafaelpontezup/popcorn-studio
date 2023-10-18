@@ -4,7 +4,7 @@ metadata:
   name: popcorn-springboot-actuator-plugin
   display-name: Spring Boot Actuator plugin
   description: Habilita microsserviço a expor endpoints de Health Checking e Metrics via Spring Boot Actuator
-  version: 0.0.1
+  version: 0.0.2
   picture: plugin.png
 spec:
   type: app
