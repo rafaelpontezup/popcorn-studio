@@ -33,6 +33,7 @@ spec:
       name: project_artifact_id
       type: text
       required: true
+      help: A propriedade artifact_id do Maven é utilizada como nome do .jar da aplicação
       pattern: ^[a-z]([a-z0-9]|_)*$
     - label: Versão do Spring Boot
       name: project_springboot_version
