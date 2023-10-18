@@ -3,7 +3,7 @@ kind: plugin
 metadata:
   name: popcorn-springboot-actuator-plugin
   display-name: Spring Boot Actuator plugin
-  description: Habilita microsserviço a expor endpoint de Health Checking via modulo Spring Boot Actuator
+  description: Habilita microsserviço a expor endpoints de Health Checking e Metrics via Spring Boot Actuator
   version: 0.0.1
   picture: plugin.png
 spec:
@@ -21,3 +21,30 @@ spec:
     - Java
     - Spring Boot
   stk-projects-only: false
+
+  hooks:
+    ##
+    # Edit pom.xml
+    ##
+    - type: edit
+      path: pom.xml
+      trigger: after-render    
+      changes:
+        - search:
+            string: "</dependencies>"
+            insert-before:
+              snippet: snippets/snippet-pom.xml.jinja
+            when:
+              not-exists-snippet: snippets/snippet-pom.xml.jinja
+    ##
+    # Edit application.yaml
+    ##
+    - type: edit
+      path: src/main/resources/application.yaml
+      trigger: after-render    
+      changes:
+        - insert:
+            line: -1
+            snippet: snippets/snippet-application.yaml.jinja
+            when:
+              not-exists: "management:"
