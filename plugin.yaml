@@ -16,6 +16,8 @@ spec:
   requirements: docs/requirements.md
   technologies: # Ref: https://docs.stackspot.com/content-creator/studio/yaml-files/plugin-yaml/#technologies
     - Api
+    - Java
+    - Spring
   inputs:
     - label: Type name of your resource
       name: resource
