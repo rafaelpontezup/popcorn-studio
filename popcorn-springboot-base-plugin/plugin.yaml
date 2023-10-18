@@ -2,7 +2,7 @@ schema-version: v2
 kind: plugin
 metadata:
   name: popcorn-springboot-base-plugin
-  display-name: popcorn-springboot-base-plugin
+  display-name: Spring Boot Base plugin
   description: Plugin base para construção de APIs REST com Spring Boot
   version: 0.0.1
   picture: plugin.png
