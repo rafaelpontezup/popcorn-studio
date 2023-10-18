@@ -17,24 +17,31 @@ spec:
   technologies: # Ref: https://docs.stackspot.com/content-creator/studio/yaml-files/plugin-yaml/#technologies
     - Api
     - Java
-    - Spring
+    - Spring Boot
   inputs:
-    - label: Type name of your resource
-      name: resource
+    - label: Nome da aplicação
+      name: project_name
       type: text
       required: true
-      default: Client
-      pattern: '([A-Z][a-z]+)+'
-      help: 'Inform your resource name (e.g.: Client)'
-    - label: Choose http method of new endpoint
-      name: method
+    - label: Group_Id do Maven
+      name: project_group_id
+      type: text
+      required: true
+      default: "br.com.zup.popcornstudio"
+    - label: Artifact_Id do Maven
+      name: project_artifact_id
+      type: text
+      required: true
+    - label: Versão do Spring Boot
+      name: project_springboot_version
+      type: text
+      default: 3.1.4
+      required: true
+    - label: Versão do Java
+      name: project_java_version
       type: text
       items:
-        - GET
-        - POST
-        - PUT
-        - DELETE
-        - PATCH
-      default: GET
+        - "17"
+        - "21"
+      default: 17
       required: true
-      help: 'Inform the method of the endpoint (e.g.: post or delete)'
