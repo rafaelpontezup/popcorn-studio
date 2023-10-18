@@ -21,6 +21,19 @@ spec:
     - Java
     - Spring Boot
   stk-projects-only: false
+  inputs:
+    - label: Quais endpoints a aplicação deve expor?
+      name: actuator_endpoints
+      type: multiselect
+      required: true
+      items:
+        - health
+        - metrics
+        - env
+      default: health
+      help: Selecione quais endpoints de monitoramento serão expostos pelo Spring Boot Actuator
+  computed-inputs:
+    actuator_endpoints_joined: "{{actuator_endpoints | join(',')}}"
 
   hooks:
     ##
