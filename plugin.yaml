@@ -45,3 +45,10 @@ spec:
         - "21"
       default: 17
       required: true
+  computed-inputs:
+    project_name_capitalized: "{{project_name | to_camel}}"
+    project_artifact_id_formatted: "{{project_artifact_id | lower | to_kebab}}"
+    project_artifact_id_sanitized: "{{project_artifact_id_formatted | regex_replace('[^0-9a-zA-Z_]', '')}}"
+    project_base_package: "{{project_group_id}}.{{project_artifact_id_sanitized}}"
+    project_base_package_dir: "{{project_base_package | group_id_folder}}"
+    
