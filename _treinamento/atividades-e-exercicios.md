@@ -565,19 +565,61 @@ test -x mvnw && echo "It's executable" || echo "It's NOT executable"
 
 - 16.1. Acesse o [portal da StackSpot](https://stackspot.com/) e faça o login na sua conta personal (ou outra conta na qual você tenha permissão de criar conteúdo);
 - 16.2. **Crie um Studio** com o nome `popcorn-studio`, preencha suas informações básicas e escolha um icone bacana (Google Images ajuda aqui 😉);
+
 - 16.3. Agora, na linha de comando e dentro do diretório do plugin (`popcorn-springboot-base-plugin`), **publique o plugin** no estúdio que criamos no portal da StackSpot:
+
     ```sh
     stk publish plugin --studio popcorn-studio
     ```
+
 - 16.4. De volta a portal, e dentro do estúdio, **crie uma Stack** chamada de "`Spring Boot REST API Stack`", preencha suas informações básicas e escolha um icone bacana (Google Images ajuda aqui 😉);
+
 - 16.5. Entre na Stack criada e adicione nosso plugin `popcorn-springboot-base-plugin`;
+
 - 16.6. Ainda dentro da Stack, **crie um Starter** com o nome "`rest-api-base`", preencha suas informações básicas e também adicione nosso plugin `popcorn-springboot-base-plugin`"
 
-17. Agora, vamos consumir o plugin criando uma aplicação via portal da StackSpot. Dessa forma, siga os passos abaixo:
+17. Agora, antes de consumir nossa Stack e Plugins, precisamos configurar uma Workspace. Dessa forma, siga os passos abaixo:
 
-> ⚠️ **Atenção**: Este passo só será possível após configurar o SCM (Source Code Management) na sua conta personal StackSpot. Se você ainda não fez este setup da conta com o **Github**, por favor siga o [manual na documentação oficial da StackSpot](https://docs.stackspot.com/home/account/guides/scm-integration/scm-github/).
+> ⚠️ **Atenção**: Este passo só será possível após configurar o SCM (Source Code Management) na sua conta personal da StackSpot. Se você ainda não fez este setup da conta, por favor siga o [manual na documentação oficial da StackSpot](https://docs.stackspot.com/home/account/guides/scm-integration/) e configure sua conta StackSpot com o **Github**.
 
-- 17.1. **Importe a Action** oficial da StackSpot para permitir a criação de repositórios na sua conta do Github.
+- 17.1. **Importe a Action** oficial da StackSpot, `create-repo-github`, para permitir a criação de repositórios durante o fluxo de criação de aplicações pelo portal:
+
+    ```sh
+    # clone o repositório de workflows da StackSpot
+    git clone https://github.com/stack-spot/stackspot-workflows-action.git
+
+    # entre na action de criação de repositórios do github: create-repo-github
+    cd stackspot-workflows-action/stackspot-actions/github/create-repo-github
+
+    # publique a action no nosso estúdio
+    stk publish action
+    ```
+- 17.2. Crie uma nova versão da nossa Stack,  **adicione a Action** `create-repo-github` na Stack e por fim publique-a;
+
+- 17.3. Agora, na área Workspaces, **crie uma nova Workspace** com o nome "`ingressos-cinema`", preencha suas informações básicas e escolha um icone bacana (Google Images ajuda aqui 😉);
+
+- 17.4. Dentro da nossa Workspace, adicione nossa Stack;
+
+- 17.5. Ainda na Workspace, acesse a Stack e **configure o plugin** com inputs padrão e mandatórios que você entender que façam sentido;
+
+- 17.6. Ainda na Stack, **configure a action** `create-repo-github` com o valor padrão `public` como opcional;
+
+- 17.7. Ainda na Stack, **configure o Workflow** *Create-app (Portal)* anexando nossa action `create-repo-github` a evento *Before* do workflow;
+
+
+18. Por fim, vamos consumir nossa Stack, Starters e Plugins **criando uma aplicação** via portal da StackSpot. Dessa forma, siga os passos abaixo:
+
+- 18.1. Dentro da nossa Workspace, **crie uma nova aplicação** pelo portal, preencha as informações em todas as etapas do fluxo de criação (se desejar, pule a etapa de "*Api Definitions*"); Na última etapa revise os dados e submeta as mudanças.
+
+- 18.2. Acompanhe os a pipeline de criação de aplicação na aba *Actions* da sua conta do Github (organização). Quando ela finalizar, acesse o repositório criado na sua organização e aceite o Pull Request (PR);
+
+- 18.3. Faça o clone do repositório criado, e rode o build e bateria de testes via Maven:
+
+    ```sh
+    ./mvnw clean test
+    ```
+
+18.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço;
 
 
 
