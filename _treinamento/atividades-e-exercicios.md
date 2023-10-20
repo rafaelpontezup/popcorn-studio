@@ -39,7 +39,7 @@ mkdir popcorn-studio
 stk create plugin popcorn-springboot-base-plugin
 ```
 
-5. Ainda dentro do diretório do estúdio, abra-o com seue editor de texto preferido. Se estiver utilizando o Visual Studio Code (VsCode), basta executar o comando abaixo:
+5. Ainda dentro do diretório do estúdio, abra-o com seu editor de texto preferido. Se estiver utilizando o **Visual Studio Code (VsCode)**, basta executar o comando abaixo dentro do diretório:
 
 ```sh
 code .
@@ -62,7 +62,7 @@ spec:
         - Spring Boot
 ```
 
-7. Agora, copie o conteúdo do projeto que criamos no site do Spring Initializr para o diretório `templates` do nosso plugin. É importante ter cuidado com os arquivos ocultos, pois eles também precisam ser copiados. Portanto, basta executar o comando abaixo:
+7. Agora, copie o conteúdo do projeto que criamos no site do Spring Initializr para o diretório `templates` do nosso plugin. **É importante ter cuidado com os arquivos ocultos, pois eles também precisam ser copiados**. Portanto, basta executar o comando abaixo:
 
 ```sh
 cp -R <diretorio-do-projeto>/.* /plugin/templates
@@ -174,7 +174,7 @@ Edite o `README.md` com o seguinte conteudo:
 E por fim, vamos limpar o conteúdo do diretório `popcorn-demo-teste`, aplicar o plugin novamente e ver o resultado:
 
 ```sh
-# limpa diretório
+# limpa diretório "porpcorn-demo-teste"
 rm -rf * .*
 
 # aplica o plugin
@@ -250,6 +250,311 @@ class {{project_name_capitalized}}ApplicationTests {
     - De `src/test/java/com/example/demo` para `src/test/java/{{project_base_package_dir}}`;
 
 > ⚠️ **Atenção**: Lembre-se que os pacotes podem variar de nome de acordo com os dados preenchidos no site do Spring Initializr.
+
+- 12.6. Agora vamos testar se o código foi interpolado corretamente nos arquivos de `templates`. Para isso, **dentro do diretório de testes do plugin (`porpcorn-demo-teste`)**, execute os comandos abaixo:
+
+```sh
+# limpa diretório "porpcorn-demo-teste"
+rm -rf * .*
+
+# aplica o plugin
+stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
+
+# valida conteúdo com Maven: compilando código e rodando a bateria de testes
+./mvnw clean test
+```
+
+> 💡 **Dica**: Outras formas de validar o conteúdo gerado pelo plugin é importando o projeto na sua IDE preferida (como IntelliJ ou Eclipse) ou inicializando a aplicação através do comando `./mvnw spring-boot:run` do Maven.
+
+13. Em seguida, vamos customizar nosso template da forma que entendemos que um microsserviço em Java e Spring Boot deve ser. Dessa forma, siga os passos a seguir:
+
+- 13.1. Primeiramente vamos adicionar a dependência do OpenAPI com Swagger-UI na aplicação. Para isso, adicione a seguinte dependência do `springdoc-openapi` no arquivo `pom.xml` da aplicação:
+
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.1.0</version>
+</dependency>
+```
+
+- 13.2. O próximo passo é converter os arquivos de configuração do Spring Boot da aplicação para o formado YAML:
+   -  Renomeie o arquivo `application.properties` para `application.yaml`;
+   -  Renomeie o arquivo `application-test.properties` para `application-test.yaml` (se ele não existir, crie-o dentro do diretório `src/test/resources`);
+
+- 13.3. Agora, altere o conteúdo do arquivo `application.yaml` como abaixo:
+
+```yaml
+##
+# Server
+##
+server:
+    port: 8080
+    servlet:
+        context-path: /
+    error:
+        include-message: always
+        include-binding-errors: always
+        include-stacktrace: on_param
+        include-exception: false
+
+##
+# Spring Application
+##
+spring:
+    application:
+        name: {{project_artifact_id_formatted}}
+    output:
+        ansi:
+            enabled: ALWAYS
+```
+
+- 13.4. E também altere o conteúdo do arquivo `application-test.yaml` como abaixo:
+
+```yaml
+##
+# Spring Application
+##
+spring:
+    jackson:
+        serialization:
+            indent_output: true
+```
+
+- 13.5. Para ter certeza que o que fizemos não quebrou nada no nosso template, vamos aplicá-lo e ver se a aplicação funciona como esperado. Portanto, dentro do diretório de testes do plugin (`porpcorn-demo-teste`) execute os comandos abaixo:
+
+```sh
+# limpa diretório "porpcorn-demo-teste"
+rm -rf * .*
+
+# aplica o plugin
+stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
+
+# valida conteúdo com Maven: compilando código e rodando a bateria de testes
+./mvnw clean test
+```
+
+14. Com a customização de dependências e configuração da aplicação feitas e funcionando, o próximo passo é adicionar **sample code** de API REST (seguindo nossos padrões de design e arquitetura) para ajudar os desenvolvedores(as) nos primeiros passos. Dessa forma, siga os passos abaixo:
+
+- 14.1. Primeiramente, para facilitar a manipulação e identificação de código de exemplo (*sample code*), vamos criar os seguintes pacotes no classpath da aplicação:
+
+    - Na source folder `src/main`, crie o pacote `samples` dentro do diretório `/java/{{project_base_package_dir}}`;
+    - Crie o pacote `produtos` dentro do pacote `samples` da `src/main`;
+    - Faça o mesmo na source folder `src/test`;
+
+- 14.2. Em seguida, crie o controller de exemplo `NovoProdutoController.java` dentro do pacote `samples.produtos` localizado na source folder `src/main` com o conteúdo abaixo:
+
+```java
+package {{project_base_package}}.samples.produtos;
+
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class NovoProdutoController {
+
+    @PostMapping("/api/v1/produtos")
+    public ResponseEntity<?> cadastra(@RequestBody @Valid NovoProdutoRequest request) {
+
+        // executa lógica de negócio
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .build();
+    }
+
+}
+```
+
+- 14.3. Ainda dentro do pacote `samples.produtos`, crie a classe de DTO `NovoProdutoRequest.java` com o seguinte conteúdo:
+
+```java
+package {{project_base_package}}.samples.produtos;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
+
+public record NovoProdutoRequest(
+        @NotBlank @Size(max = 60) String nome,
+        @NotBlank @Size(max = 2000) String descricao,
+        @NotNull @Positive Double preco
+) {
+}
+```
+
+- 14.4. Em seguida, crie a classe de testes de integração para nosso controller com o nome `NovoProdutoControllerTest.java` (repare no sufixo `Test`) dentro do pacote `samples.produtos` da source folder `src/test` com o conteúdo abaixo:
+
+```java
+package {{project_base_package}}.samples.produtos;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.http.HttpHeaders.ACCEPT_LANGUAGE;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@AutoConfigureMockMvc(printOnlyOnFailure = false)
+class NovoProdutoControllerTest {
+
+    @Autowired
+    protected MockMvc mockMvc;
+
+    @Autowired
+    protected ObjectMapper mapper;
+
+    @Test
+    @DisplayName("deve cadastrar novo produto")
+    void t1() throws Exception {
+        // scenario
+        NovoProdutoRequest request = new NovoProdutoRequest(
+                "iPad Mini",
+                "iPad Mini 6a geração",
+                3500.99
+        );
+
+        // action and validation
+        mockMvc.perform(post("/api/v1/produtos")
+                        .contentType(APPLICATION_JSON)
+                        .content(toJson(request))
+                        .header(ACCEPT_LANGUAGE, "en"))
+                .andExpect(status().isCreated())
+        ;
+    }
+
+    @Test
+    @DisplayName("não deve cadastrar novo produto quando parametros invalidos")
+    void t2() throws Exception {
+        // scenario
+        NovoProdutoRequest request = new NovoProdutoRequest(
+                "",
+                "a".repeat(2001),
+                -0.01
+        );
+
+        // action and validation
+        mockMvc.perform(post("/api/v1/produtos")
+                        .contentType(APPLICATION_JSON)
+                        .content(toJson(request))
+                        .header(ACCEPT_LANGUAGE, "en"))
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    /**
+     * Converts an object payload to {@code String} in JSON format
+     */
+    public String toJson(Object payload) throws JsonProcessingException {
+        return mapper.writeValueAsString(payload);
+    }
+
+}
+```
+
+- 14.5. Certifique-se que o resultado final do diretório `templates` do nosso plugin deve ser semelhante a este:
+
+```
+templates
+    ├── HELP.md
+    ├── README.md
+    ├── mvnw
+    ├── mvnw.cmd
+    ├── pom.xml
+    └── src
+        ├── main
+        │   ├── java
+        │   │   └── {{project_base_package_dir}}
+        │   │       ├── samples
+        │   │       │   └── produtos
+        │   │       │       ├── NovoProdutoController.java
+        │   │       │       └── NovoProdutoRequest.java
+        │   │       └── {{project_name_capitalized}}Application.java
+        │   └── resources
+        │       └── application.yaml
+        └── test
+            ├── java
+            │   └── {{project_base_package_dir}}
+            │       ├── samples
+            │       │   └── produtos
+            │       │       └── NovoProdutoControllerTest.java
+            │       └── {{project_name_capitalized}}ApplicationTests.java
+            └── resources
+                └── application-test.yaml
+```
+
+- 14.6. Por fim, para ter certeza que tudo está funcionando como esperado, vamos testar nosso plugin. Portanto, dentro do diretório de testes do plugin (`porpcorn-demo-teste`) execute os comandos abaixo:
+
+```sh
+# limpa diretório "porpcorn-demo-teste"
+rm -rf * .*
+
+# aplica o plugin
+stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
+
+# valida conteúdo com Maven: compilando código e rodando a bateria de testes
+./mvnw clean test
+```
+
+15. Agora, vamos adicionar um hook (`hook`) no nosso plugin para garantir que o executável do Maven Wrapper (arquivo `mvnw`) possui permissão de execução logo após a renderização do template. Para isso, siga os passos:
+
+- 15.1. No arquivo `plugin.yaml` adicione o seguinte código:
+
+```yaml
+spec:
+    # ...
+    inputs:
+        # ...
+    computed-inputs:
+        # ...
+    ##
+    # Hooks
+    ##
+    hooks:
+        - type: run
+        trigger: after-render
+        commands:
+            - chmod +x mvnw mvnw.cmd
+```
+
+- 15.2. Valida o plugin:
+
+```sh
+stk validate plugin
+# Não deve haver errors ou warnings aqui
+```
+
+- 15.3. E verifique se o arquivo `mvnw` do Maven Wrapper está sendo gerado com permissões de execução. Para isso, dentro do diretório de testes do plugin (`porpcorn-demo-teste`) execute os comandos abaixo:
+
+```sh
+# limpa diretório "porpcorn-demo-teste"
+rm -rf * .*
+
+# aplica o plugin
+stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
+
+# verifica se mvnw é executável
+test -x mvnw && echo "It's executable" || echo "It's NOT executable"
+```
+
+16. Agora, vamos publicar o plugin no estúdio da nossa conta da StackSpot. 
 
 
 
