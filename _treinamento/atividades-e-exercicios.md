@@ -397,7 +397,7 @@ public record NovoProdutoRequest(
 }
 ```
 
-- 14.4. Em seguida, crie a classe de testes de integração para nosso controller com o nome `NovoProdutoControllerTest.java` (repare no sufixo `Test`) dentro do pacote `samples.produtos` da source folder `src/test` com o conteúdo abaixo:
+- 14.4. Em seguida, dentro do pacote `samples.produtos` da source folder `src/test`, crie a classe de testes de integração para nosso controller com o nome `NovoProdutoControllerTest.java` (repare no sufixo `Test`) com o seguinte conteúdo:
 
 ```java
 package {{project_base_package}}.samples.produtos;
@@ -561,7 +561,19 @@ stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
 test -x mvnw && echo "It's executable" || echo "It's NOT executable"
 ```
 
-16. Agora, vamos publicar o plugin no estúdio da nossa conta da StackSpot. 
+16. Agora, vamos publicar o plugin no estúdio da nossa conta da StackSpot. Siga os passos:
+
+- 16.1. Acesse o [portal da StackSpot](https://stackspot.com/) e faça o login na sua conta personal (ou outra conta na qual você tenha permissão de criar conteúdo);
+- 16.2. **Crie um Studio** com o nome `popcorn-studio`, preencha suas informações básicas e escolha um icone bacana (Google Images ajuda aqui 😉);
+- 16.3. Agora, na linha de comando e dentro do diretório do plugin (`popcorn-springboot-base-plugin`), **publique o plugin** no estúdio que criamos no portal da StackSpot:
+    ```sh
+    stk publish plugin --studio popcorn-studio
+    ```
+- 16.4. De volta a portal, e dentro do estúdio, **crie uma Stack** chamada de "`Spring Boot REST API Stack`", preencha suas informações básicas e escolha um icone bacana (Google Images ajuda aqui 😉);
+- 16.5. Entre na Stack criada e adicione nosso plugin `popcorn-springboot-base-plugin`;
+- 16.6. Ainda dentro da Stack, **crie um Starter** com o nome "`rest-api-base`", preencha suas informações básicas e também adicione nosso plugin `popcorn-springboot-base-plugin`"
+
+17. 
 
 
 
