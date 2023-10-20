@@ -573,7 +573,11 @@ test -x mvnw && echo "It's executable" || echo "It's NOT executable"
 - 16.5. Entre na Stack criada e adicione nosso plugin `popcorn-springboot-base-plugin`;
 - 16.6. Ainda dentro da Stack, **crie um Starter** com o nome "`rest-api-base`", preencha suas informações básicas e também adicione nosso plugin `popcorn-springboot-base-plugin`"
 
-17. 
+17. Agora, vamos consumir o plugin criando uma aplicação via portal da StackSpot. Dessa forma, siga os passos abaixo:
+
+> ⚠️ **Atenção**: Este passo só será possível após configurar o SCM (Source Code Management) na sua conta personal StackSpot. Se você ainda não fez este setup da conta com o **Github**, por favor siga o [manual na documentação oficial da StackSpot](https://docs.stackspot.com/home/account/guides/scm-integration/scm-github/).
+
+- 17.1. **Importe a Action** oficial da StackSpot para permitir a criação de repositórios na sua conta do Github.
 
 
 
