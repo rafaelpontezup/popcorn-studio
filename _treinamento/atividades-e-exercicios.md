@@ -105,16 +105,16 @@ inputs:
       required: true
 ```
 
-9. Agora, para ter certeza que os inputs foram preenchidos corretamente, vamos validá-los com a CLI e também imprimi-los no arquivo `README.md` dentro de `templates`.
+9. Agora, para ter certeza que os inputs foram preenchidos corretamente, vamos validá-los com a CLI e também imprimi-los no arquivo `README.md` dentro de `templates`. Dessa forma, siga os passos abaixo:
 
-Dentro do diretório do plugin `popcorn-springboot-base-plugin`, execute o comando de validação da CLI:
+- 9.1. Dentro do diretório do plugin `popcorn-springboot-base-plugin`, execute o comando de validação da CLI:
 
 ```sh
 stk validate plugin
 # Não deve haver errors ou warnings aqui
 ```
 
-E para imprimi-los, basta editar o arquivo `README.md` dentro do diretório `templates` com o seguinte conteúdo:
+- 9.2. E para imprimi-los, basta editar o arquivo `README.md` dentro do diretório `templates` com o seguinte conteúdo:
 
 ```
 ### Inputs
@@ -126,20 +126,27 @@ E para imprimi-los, basta editar o arquivo `README.md` dentro do diretório `tem
 - project_java_version: {{project_java_version}}
 ```
 
-10. O próximo passo pedir para CLI aplicar o plugin em algum diretório vazio na nossa máquina. Dessa forma, **fora da estúdio**, crie um diretório chamado "popcorn-demo-teste" e execute o seguinte comando da CLI:
+10. O próximo passo é pedir à CLI para aplicar o plugin em algum diretório vazio na nossa máquina. Portanto, siga os passos abaixo:
+
+- 10.1. **Fora do estúdio**, crie um diretório chamado "`popcorn-demo-teste`" e execute o seguinte comando da CLI:
 
 ```sh
+# crie o diretório e entre nele
+mkdir popcorn-demo-teste; cd popcorn-demo-teste
+
 # diretório popcorn-demo-teste está na mesma hieraquia do diretório do estúdio
 stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
 ```
 
-Responda as perguntas solicitadas pelo plugin e em seguida verifique se os inputs foram impressos corretamante no arquivo `README.md` gerado pelo plugin:
+- 10.2. Responda as perguntas solicitadas pelo plugin (inputs configurados) e em seguida verifique se os inputs foram impressos corretamante no arquivo `README.md` gerado pelo plugin:
 
 ```sh
 cat README.md 
 ```
 
-11. Em seguida, vamos adicionar os `computed-inputs` no arquivo `plugin.yaml` e também imprimi-los no `README.md`. Para isso, adicione o código abaixo no arquivo `plugin.yaml`:
+11. Em seguida, vamos adicionar os `computed-inputs` no arquivo `plugin.yaml` e também imprimi-los no `README.md`. Para isso, siga os passos:
+
+- 11.1. Adicione o código abaixo no arquivo `plugin.yaml`:
 
 ```yaml
 computed-inputs:
@@ -152,14 +159,14 @@ computed-inputs:
 
 > ⚠️ **Atenção**: A propriedade `computed-inputs` deve estar na mesma hierarquia da propriedade `inputs`. Ou seja, no mesmo nível de indentação.
 
-Valide o plugin com o comando da CLI abaixo:
+- 11.2. Valide o plugin com o comando da CLI abaixo:
 
 ```sh
 stk validate plugin
 # Não deve haver errors ou warnings aqui
 ```
 
-Edite o `README.md` com o seguinte conteudo:
+- 11.3. Edite o `README.md` com o seguinte conteudo:
 
 ```
 ## Computed-inputs
@@ -171,7 +178,7 @@ Edite o `README.md` com o seguinte conteudo:
 - project_base_package_dir: "{{project_base_package_dir}}"
 ```
 
-E por fim, vamos limpar o conteúdo do diretório `popcorn-demo-teste`, aplicar o plugin novamente e ver o resultado:
+- 11.4. E por fim, vamos limpar o conteúdo do diretório `popcorn-demo-teste`, aplicar o plugin novamente e ver o resultado:
 
 ```sh
 # limpa diretório "porpcorn-demo-teste"
