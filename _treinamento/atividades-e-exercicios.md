@@ -65,7 +65,7 @@ spec:
 7. Agora, copie o conteúdo do projeto que criamos no site do Spring Initializr para o diretório `templates` do nosso plugin. **É importante ter cuidado com os arquivos ocultos, pois eles também precisam ser copiados**. Portanto, basta executar o comando abaixo:
 
 ```sh
-cp -R <diretorio-do-projeto>/.* /plugin/templates
+cp -R <diretorio-do-projeto>/. /plugin/templates
 ```
 
 > 💡 **Dica**: Outra forma seria renomear o projeto do Spring Initializr para "templates" e cópia-lo por cima do diretório `templates` do plugin.
@@ -594,6 +594,9 @@ test -x mvnw && echo "It's executable" || echo "It's NOT executable"
     # publique a action no nosso estúdio
     stk publish action
     ```
+
+    > 💡 **Dica**: O único diretório que importa do repositório `stackspot-workflows-action` que clonamos é o diretório `<repo>/stackspot-actions/github/create-repo-github`, pois ela é a Action que precisamos de fato publicar no nosso Studio. Portanto, você pode cópia-lo para seu Studio e em seguida versioná-lo no seu Github.
+
 - 17.2. Crie uma nova versão da nossa Stack,  **adicione a Action** `create-repo-github` na Stack e por fim publique-a;
 
 - 17.3. Agora, na área Workspaces, **crie uma nova Workspace** com o nome "`ingressos-cinema`", preencha suas informações básicas e escolha um icone bacana (Google Images ajuda aqui 😉);
