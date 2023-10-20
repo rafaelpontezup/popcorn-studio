@@ -619,7 +619,7 @@ test -x mvnw && echo "It's executable" || echo "It's NOT executable"
     ./mvnw clean test
     ```
 
-18.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço;
+18.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
 
 
 
