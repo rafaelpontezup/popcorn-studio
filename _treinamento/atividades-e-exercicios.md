@@ -105,14 +105,16 @@ inputs:
       required: true
 ```
 
-9. Agora, para ter certeza que os inputs foram preenchidos corretamente, vamos validá-los com a CLI e também imprimi-los no arquivo `README.md` dentro de `templates`:
+9. Agora, para ter certeza que os inputs foram preenchidos corretamente, vamos validá-los com a CLI e também imprimi-los no arquivo `README.md` dentro de `templates`.
+
+Dentro do diretório do plugin `popcorn-springboot-base-plugin`, execute o comando de validação da CLI:
 
 ```sh
 stk validate plugin
-# Não deve haver erros ou warning aqui
+# Não deve haver errors ou warnings aqui
 ```
 
-E para imprimi-los, basta editar o arquivo `README.md` com o seguinte conteúdo:
+E para imprimi-los, basta editar o arquivo `README.md` dentro do diretório `templates` com o seguinte conteúdo:
 
 ```
 ### Inputs
@@ -136,6 +138,118 @@ Responda as perguntas solicitadas pelo plugin e em seguida verifique se os input
 ```sh
 cat README.md 
 ```
+
+11. Em seguida, vamos adicionar os `computed-inputs` no arquivo `plugin.yaml` e também imprimi-los no `README.md`. Para isso, adicione o código abaixo no arquivo `plugin.yaml`:
+
+```yaml
+computed-inputs:
+    project_name_capitalized: "{{project_name | to_camel}}"
+    project_artifact_id_formatted: "{{project_artifact_id | lower | to_kebab}}"
+    project_artifact_id_sanitized: "{{project_artifact_id_formatted | regex_replace('[^0-9a-zA-Z_]', '')}}"
+    project_base_package: "{{project_group_id}}.{{project_artifact_id_sanitized}}"
+    project_base_package_dir: "{{project_base_package | group_id_folder}}"
+```
+
+> ⚠️ **Atenção**: A propriedade `computed-inputs` deve estar na mesma hierarquia da propriedade `inputs`. Ou seja, no mesmo nível de indentação.
+
+Valide o plugin com o comando da CLI abaixo:
+
+```sh
+stk validate plugin
+# Não deve haver errors ou warnings aqui
+```
+
+Edite o `README.md` com o seguinte conteudo:
+
+```
+## Computed-inputs
+
+- project_name_capitalized: "{{project_name_capitalized}}"
+- project_artifact_id_formatted: "{{project_artifact_id_formatted}}"
+- project_artifact_id_sanitized: "{{project_artifact_id_sanitized}}"
+- project_base_package: "{{project_base_package}}"
+- project_base_package_dir: "{{project_base_package_dir}}"
+```
+
+E por fim, vamos limpar o conteúdo do diretório `popcorn-demo-teste`, aplicar o plugin novamente e ver o resultado:
+
+```sh
+# limpa diretório
+rm -rf * .*
+
+# aplica o plugin
+stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
+
+# verifica conteúdo dos computed-inputs
+cat README.md
+```
+
+12. Agora, vamos interpolar os `inputs` e `computed-inputs` nos arquivos do nosso projeto dentro do diretório de `templates`. Para isso, siga os passos abaixo:
+
+- 12.1. Edite as tags do arquivo `pom.xml` com o seguinte conteúdo:
+
+```xml
+<parent>
+    <version>{{project_springboot_version}}</version>
+</parent>
+
+<groupId>{{project_group_id}}</groupId>
+<artifactId>{{project_artifact_id_formatted}}</artifactId>
+<name>{{project_name}}</name>
+
+<properties>
+    <java.version>{{project_java_version}}</java.version>
+</properties>
+```
+
+- 12.2. Altere o nome da classe `DemoAppApplication.java` para `{{project_name_capitalized}}Application.java`.
+
+> ⚠️ **Atenção**: O nome da classe `DemoAppApplication.java` pode variar de acordo com os parâmetros informados no site do Spring Initializr. Mas ela é a classe anotada com `@SpringBootApplication` do Spring Boot que fica na source folder `src/main/java` do projeto.
+
+- 12.3. Agora, dentro da classe `{{project_name_capitalized}}Application.java`, altere seu conteúdo com os inputs do nosso plugin:
+
+```java
+package {{project_base_package}};
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class {{project_name_capitalized}}Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run({{project_name_capitalized}}Application.class, args);
+	}
+
+}
+```
+
+- 12.3. Faremos o mesmo para a classe de testes do projeto, chamada de `DemoAppApplicationTests.java` que fica na source folder `src/test/java` do projeto. Para isso, altere o nome da classe para `{{project_name_capitalized}}ApplicationTests.java`.
+
+- 12.4. Dentro da classe `{{project_name_capitalized}}ApplicationTests.java`, altere seu conteúdo com os inputs do nosso plugin:
+
+```java
+package {{project_base_package}};
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class {{project_name_capitalized}}ApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+```
+
+- 12.5. O próximo passo é renomear o caminho (*path*) de pacotes das classes do projeto:
+
+    -  De `src/main/java/com/example/demo` para `src/main/java/{{project_base_package_dir}}`;
+    - De `src/test/java/com/example/demo` para `src/test/java/{{project_base_package_dir}}`;
+
+> ⚠️ **Atenção**: Lembre-se que os pacotes podem variar de nome de acordo com os dados preenchidos no site do Spring Initializr.
 
 
 
