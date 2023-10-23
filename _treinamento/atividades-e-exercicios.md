@@ -20,9 +20,45 @@ Neste módulo criaremos nossa conta personal na Stackspot, instalaremos a CLI na
 
 Para isso, acesse o site e siga as atividades abaixo:
 
-1. Criar uma conta Personal na StackSot;
-2. Instalar a CLI;
-3. Logar na conta via CLI;
+1. Criar uma conta Personal na StackSot
+    * Acesse o menu [Download](https://www.stackspot.com/pt/download-pt) e crie sua conta personal utilizando sua conta do Github;
+2. [Instalar a CLI](https://www.stackspot.com/pt/download-pt);
+    * Após criar e logar na sua conta Stackspot, basta baixar a CLI de acordo com seu sistema operacional (OS);
+3. Logar na conta via CLI
+    * Após instalar a CLI, basta executar o seguinte comando para logar na sua conta Stackspot:
+    ```sh
+    stk login
+    ```
+
+Em caso de dúvidas, utilize o argumento `-h` nos comando da CLI, por exemplo:
+
+```sh
+# comandos básicos
+stk -h
+
+# entrar e sair de uma workspace
+stk use workspace
+stk exit workspace
+
+# listando componentes
+stk list -h
+stk list workspace
+stk list plugin
+
+# criando plugins
+stk create -h
+stk create plugin -h
+
+# aplicando plugins
+stk apply -h
+stk apply plugin -h
+
+# publicando plugins
+stk publish -h
+stk publish plugin
+```
+
+Em caso de dúvidas ou para mais detalhes, acesse a [documentação oficial da StackSpot](https://docs.stackspot.com/).
 
 ## Módulo 2: Criando plugin base e conceitos básicos
 
