@@ -630,7 +630,7 @@ test -x mvnw && echo "It's executable" || echo "It's NOT executable"
 
 - 18.1. Dentro da nossa Workspace, **crie uma nova aplicação** pelo portal, preencha as informações em todas as etapas do fluxo de criação (se desejar, pule a etapa de "*Api Definitions*"); Na última etapa revise os dados e submeta as mudanças.
 
-- 18.2. Acompanhe os a pipeline de criação de aplicação na aba *Actions* da sua conta do Github (organização). Quando ela finalizar, acesse o repositório criado na sua organização e aceite o Pull Request (PR);
+- 18.2. Acompanhe a pipeline de criação de aplicação na aba *Actions* da sua conta do Github (organização). Quando ela finalizar, acesse o repositório criado na sua organização e aceite o Pull Request (PR);
 
 - 18.3. Faça o clone do repositório criado, e rode o build e bateria de testes via Maven:
 
@@ -638,7 +638,7 @@ test -x mvnw && echo "It's executable" || echo "It's NOT executable"
     ./mvnw clean test
     ```
 
-18.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
+- 18.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
 
 
 ## Módulo 3: Habilitando capacidade de monitoramento e health checking
@@ -805,7 +805,12 @@ spec:
     >
     > Pronto! Agora basta corrigir o plugin e re-aplicá-lo novamente sempre que necessário 🥳
 
-- 5.6. Por fim, **revise e valide** as modificações dos snippets aplicados nos arquivos `pom.xml` e `application.yaml`. Embora o build e bateria de testes passem, é comum encontrar erros de indentação ou formatação após o merge dos snippets. Aqui, você pode utilizar sua IDE ou mesmo o próprio Git com o comando abaixo:
+- 5.6. Por não haver testes de integração para a feature de monitoramento, precisamos verificar se os endpoints foram de fatos expostos. Para isso, siga os passos:
+
+    - Levante a aplicação na sua IDE ou via o comando `./mvnw spring-boot:run`;
+    - No browser, acesse cada um dos endpoints expostos para verificar o conteúdo retornado pela requisição. Os endpoints são `/actuator/health`, `/actuator/metrics` e `/actuator/env`;
+
+- 5.7. Por fim, **revise e valide** as modificações dos snippets aplicados nos arquivos `pom.xml` e `application.yaml`. Embora o build e bateria de testes passem, é comum encontrar erros de indentação ou formatação após o merge dos snippets. Aqui, você pode utilizar sua IDE ou mesmo o próprio Git com o comando abaixo:
 
     ```sh
     # dentro do diretório "porpcorn-demo-teste"
@@ -874,6 +879,46 @@ spec:
     # dentro do diretório "porpcorn-demo-teste"
     git diff
     ```
+
+7. Agora, para consumir nosso novo plugin, precisamos publicá-lo no nosso Studio, adiciona-lo na Stack e por fim adiciona-lo na nossa Workspace. Dessa forma, siga os passos abaixo:
+
+- 7.1. Na linha de comando e dentro do diretório do plugin (`popcorn-springboot-actuator-plugin`), publique o plugin no estúdio que criamos no portal da StackSpot:
+
+    ```sh
+    stk publish plugin --studio popcorn-studio
+    ```
+
+- 7.2. Agora, **crie uma nova versão da Stack existente** e adicione o nosso novo plugin à Stack;
+
+- 7.3. Ainda dentro da Stack, **adicione o plugin ao Starter existente**. Garanta que ele venha **depois** do plugin base;
+
+- 7.4. Salve e publique a nova versão da Stack;
+
+8. Para criar a aplicação com o novo plugin, precisamos antes adicionar a nova versão da Stack a nossa Workspace e configurar cada um dos plugins e actions existentes da Stack. Basta seguir os passos abaixo:
+
+- 8.1. Acesse a nossa Workspace e adicione a nova versão da Stack;
+
+- 8.2. Ainda na Workspace, acesse a Stack e configure o plugin com inputs padrão e mandatórios que você entender que façam sentido;
+
+- 8.3. Ainda na Stack, configure a action create-repo-github com o valor padrão public como opcional;
+
+- 8.4. Ainda na Stack, configure o Workflow *Create-app* (Portal) anexando nossa action `create-repo-github` a evento *Before* do workflow;
+
+9. Por fim, vamos consumir nossa Stack, Starters e Plugins **criando uma aplicação** via portal da StackSpot. Dessa forma, siga os passos abaixo:
+
+- 9.1. Dentro da nossa Workspace, **crie uma nova aplicação** pelo portal, preencha as informações em todas as etapas do fluxo de criação (se desejar, pule a etapa de "*Api Definitions*"); Na última etapa revise os dados e submeta as mudanças.
+
+- 9.2. Acompanhe a pipeline de criação de aplicação na aba *Actions* da sua conta do Github (organização). Quando ela finalizar, acesse o repositório criado na sua organização e aceite o Pull Request (PR);
+
+- 9.3. Faça o clone do repositório criado, e rode o build e bateria de testes via Maven:
+
+    ```sh
+    ./mvnw clean test
+    ```
+
+- 9.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
+
+
 
 
 
