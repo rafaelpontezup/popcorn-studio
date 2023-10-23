@@ -1,6 +1,8 @@
 # Treinamento | atividades e exercícios
 
-Aqui ficam todas as atividades e exercicios deste treinamento.
+Aqui ficam todas as atividades e exercicios deste treinamento. É importante que você treine as habilidades necessárias para construção de estúdios e plugins da StackSpot.
+
+Em cada módulo você exercitará de forma progressiva conceitos básicos e fundamentais na StackSpot que te habilitarão a construir e distribuir padrões de microsserviços via StackSpot. Além disso, você também aprenderá dicas que te ajudarão em decisões de design e testes de qualidades de cada plugin criado. 
 
 ## Módulos de estudos
 
