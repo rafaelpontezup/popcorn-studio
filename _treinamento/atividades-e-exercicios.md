@@ -729,8 +729,6 @@ spec:
             - env
         default: health
         help: Selecione quais endpoints de monitoramento serão expostos pelo Spring Boot Actuator
-    computed-inputs:
-        actuator_endpoints_joined: "{{actuator_endpoints | join(',')}}"
     ```
 
 - 4.2. Agora, também adicione um `computed-input` para formatar os endpoints por virgula (ele será utilizado nos snippets que criaremos mais a frente):
