@@ -136,7 +136,7 @@ inputs:
       name: project_group_id
       type: text
       required: true
-      pattern: '(^[a-zA-Z_\d.]*[a-zA-Z_\d]$)'
+      pattern: '^[a-zA-Z][a-zA-Z0-9_](\\.[a-zA-Z][a-zA-Z0-9_])*$'
       default: "br.com.zup.popcornstudio"
     - label: Artifact_Id do Maven
       name: project_artifact_id
