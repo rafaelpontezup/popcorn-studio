@@ -896,13 +896,13 @@ spec:
 
 8. Para criar a aplicação com o novo plugin, precisamos antes adicionar a nova versão da Stack a nossa Workspace e configurar cada um dos plugins e actions existentes da Stack. Basta seguir os passos abaixo:
 
-- 8.1. Acesse a nossa Workspace e adicione a nova versão da Stack;
+- 8.1. Acesse a nossa Workspace e **adicione a nova versão da Stack**;
 
-- 8.2. Ainda na Workspace, acesse a Stack e configure o plugin com inputs padrão e mandatórios que você entender que façam sentido;
+- 8.2. Ainda na Workspace, acesse a Stack e **configure o plugin** com inputs padrão e mandatórios que você entender que façam sentido;
 
-- 8.3. Ainda na Stack, configure a action create-repo-github com o valor padrão public como opcional;
+- 8.3. Ainda na Stack, **configure a action** `create-repo-github` com o valor padrão `public` como opcional;
 
-- 8.4. Ainda na Stack, configure o Workflow *Create-app* (Portal) anexando nossa action `create-repo-github` a evento *Before* do workflow;
+- 8.4. Ainda na Stack, **configure o Workflow** *Create-app* (Portal) anexando nossa action `create-repo-github` a evento *Before* do workflow;
 
 9. Por fim, vamos consumir nossa Stack, Starters e Plugins **criando uma aplicação** via portal da StackSpot. Dessa forma, siga os passos abaixo:
 
