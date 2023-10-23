@@ -2,7 +2,23 @@
 
 Aqui ficam todas as atividades e exercicios deste treinamento.
 
+## Módulos de estudos
+
+Estes são as atividades e exercicíos de cada módulo que iremos estudar e treinar a fim de dominar a construção de plugins de aplicação (`app`) na Stackspot: 
+
+1. [Módulo 1: Introdução a StackSpot](#módulo-1-introdução-a-stackspot)
+
+2. [Módulo 2: Criando plugin base e conceitos básicos](#módulo-2-criando-plugin-base-e-conceitos-básicos)
+
+3. [Módulo 3: Habilitando capacidade de monitoramento e health checking](#módulo-3-habilitando-capacidade-de-monitoramento-e-health-checking)
+
 ## Módulo 1: Introdução a StackSpot
+
+Neste módulo criaremos nossa conta personal na Stackspot, instalaremos a CLI na nossa máquina e por fim faremos o login na nossa conta pela CLI.
+
+### Exercícios
+
+Para isso, acesse o site e siga as atividades abaixo:
 
 1. Criar uma conta Personal na StackSot;
 2. Instalar a CLI;
@@ -10,7 +26,7 @@ Aqui ficam todas as atividades e exercicios deste treinamento.
 
 ## Módulo 2: Criando plugin base e conceitos básicos
 
-Neste módulo iremos criar o plugin base para construção microsserviços que expõe APIs REST com Spring Boot e Java.
+Neste módulo iremos criar o plugin base para construção de microsserviços que expõe APIs REST com Spring Boot e Java. Além disso, aprenderemos conceitos importantes sobre design, construção e publição de plugins na Stackspot.
 
 ### Exercícios
 
@@ -624,6 +640,240 @@ test -x mvnw && echo "It's executable" || echo "It's NOT executable"
 
 18.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
 
+
+## Módulo 3: Habilitando capacidade de monitoramento e health checking
+
+Neste módulo criaremos um novo plugin para habilitar a capacidade de monitoramento e health checking dos nossos microsserviços. Por se tratar do ecossistema Spring Boot, utilizaremos o módulo Spring Boot Actuator.
+
+### Exercícios
+
+1. Primeiramente, dentro do diretório do nosso estúdio `popcorn-studio`, crie um novo plugin com o nome `popcorn-springboot-actuator-plugin` com o comando a abaixo e responda as questões solicitadas pela CLI:
+
+```sh
+stk create plugin popcorn-springboot-actuator-plugin
+```
+
+2. Ainda dentro do diretório do estúdio, abra-o com seu editor de texto preferido. Se estiver utilizando o **Visual Studio Code (VsCode)**, basta executar o comando abaixo dentro do diretório:
+
+```sh
+code .
+```
+3. Agora vamos fazer as configurações básicas do nosso plugin. Para isso, dentro do diretório `popcorn-springboot-actuator-plugin`, abra o arquivo `plugin.yaml` e edite os atributos `display-name`, `description` e `technologies` como abaixo:
+
+```yaml
+metadata:
+    display-name: Spring Boot Actuator plugin
+    description: Habilita microsserviço a expor endpoint de monitoramento e health checking via modulo Spring Boot Actuator
+
+# ...
+
+spec:
+    # ...
+    technologies:
+        - Api
+        - Java
+        - Spring Boot
+```
+
+4. Aproveitando que estamos no arquivo `plugin.yaml`, vamos adicionar um input para solifitar os endpoints que o usuário gostaria de expor no microsserviço. Dessa forma, siga os passos:
+
+- 4.1. Adicione o `input` para solicitar quais endpoints o usuário deseja que o plugin exponha no microsserviço:
+
+    ```yaml
+    inputs:
+        - label: Quais endpoints a aplicação deve expor?
+        name: actuator_endpoints
+        type: multiselect
+        required: true
+        items:
+            - health
+            - metrics
+            - env
+        default: health
+        help: Selecione quais endpoints de monitoramento serão expostos pelo Spring Boot Actuator
+    computed-inputs:
+        actuator_endpoints_joined: "{{actuator_endpoints | join(',')}}"
+    ```
+
+- 4.2. Agora, também adicione um `computed-input` para formatar os endpoints por virgula (ele será utilizado nos snippets que criaremos mais a frente):
+
+    ```yaml
+    computed-inputs:
+        actuator_endpoints_joined: "{{actuator_endpoints | join(',')}}"
+    ```
+
+    > ⚠️ **Atenção**: A propriedade `computed-inputs` deve estar na mesma hierarquia da propriedade `inputs`. Ou seja, no mesmo nível de indentação.
+
+5. Agora, vamos criar os snippets de código que serão renderizados e utilizados no microsserviço existente para habilitar a capacidade de monitoramento do Spring Boot Actuator. Para isso, siga os passos abaixo:
+
+- 5.1. Na raiz do plugin, crie o diretório `snippets`. É nele que colocaremos todos os snippets de código do plugin;
+
+- 5.2. Agora, dentro do diretório `snippets`, crie o arquivo de snippet que será responsável por adicionar a dependência do Spring Boot Actuator no projeto. O nome do arquivo deve ser `snippet-pom.xml.jinja` e conterá o seguinte pedaço de código (atenção a indentação e quebras de linhas):
+
+    ```xml
+        
+            <!-- *************** -->
+            <!-- Spring Actuator -->
+            <!-- *************** -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+    ```
+
+- 5.3. Em seguida, ainda no diretório `snippets`, crie outro arquivo de snippet, desta vez para configurar os endpoints de monitoramento que serão expostos pela aplicação. O nome do arquivo deve ser `snippet-application.yaml.jinja` (atenção a indentação e quebras de linhas):
+
+    ```yaml
+
+    ##
+    # Spring Actuator
+    ##
+    management:
+        endpoints:
+            jmx:
+                exposure:
+                    include: "*"
+            web:
+                exposure:
+                    include: {{actuator_endpoints_joined}}
+        endpoint:
+            health:
+                show-details: always
+                show-components: always
+                probes:
+                    enabled: true
+                    add-additional-paths: true
+    ```
+
+    > ⚠️ **Atenção**: Por estarmos modificando conteúdo de formato YAML, como `application.yaml` ou `application-test.yaml`, é muito importante ter uma atenção redobrada com a formatação e indentação do código YAML que será inserido ou alterado pelo plugin, especialmente em snippets de código que serão mergeado em arquivos existentes, grandes e complexos. Qualquer erro de indentação pode gerar erros no startup da aplicação ou, pior, ser ignorada silenciosamente pela aplicação como se nada tivesse acontecido.
+
+- 5.4. O próximo passo é configurar o plugin para utilizar nossos snippets para mergear os arquivos `pom.xml` e `application.yaml` da aplicação. Para isso, adicione os 2 hooks de edição `edit` no arquivo `plugin.yaml`:
+
+    ```yaml
+    hooks:
+        ##
+        # Edit pom.xml
+        # (Using hook type=edit)
+        ##
+        - type: edit
+        path: pom.xml
+        trigger: after-render    
+        changes:
+            - search:
+                string: "</dependencies>"
+                insert-before:
+                snippet: snippets/snippet-pom.xml.jinja
+                when:
+                not-exists-snippet: snippets/snippet-pom.xml.jinja
+        ##
+        # Edit application.yaml
+        # (Using hook type=edit)
+        ##
+        - type: edit
+        path: src/main/resources/application.yaml
+        trigger: after-render    
+        changes:
+            - insert:
+                line: -1
+                snippet: snippets/snippet-application.yaml.jinja
+                when:
+                not-exists: "management:"
+    ```
+
+    > ⚠️ **Atenção**: A propriedade `hooks` deve estar na mesma hierarquia das propriedades `inputs` e `computed-inputs`. Ou seja, no mesmo nível de indentação.
+
+- 5.5. Agora, vamos resetar o conteúdo do diretório `popcorn-demo-teste`, aplicar o plugin novamente e ver o resultado:
+
+    ```sh
+    # reseta modificações do "porpcorn-demo-teste"
+    git reset --hard HEAD ; git clean -fd 
+
+    # aplica o plugin
+    stk apply plugin ../popcorn-studio/popcorn-springboot-actuator-plugin
+
+    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    ./mvnw clean test
+    ```
+
+    > 💡 **Dica**: Durante a construção e aplicação de plugins em projetos existentes, é comum encontrarmos erros de renderização de templates e snippets, o que muitas vezes pode ser trabalhoso ou impossível de desfazer manualmente. Para evitar essa fadiga, podemos tirar proveito do Git.
+    > 
+    > Para isso, basta que o projeto existente esteja versionado pelo Git e tenha todo seu conteúdo comitado (ao menos localmente). Em seguida, basta executar o comando de reset do Git abaixo:
+    > 
+    > ```sh
+    > git reset --hard HEAD ; git clean -fd
+    > ```
+    >
+    > Pronto! Agora basta corrigir o plugin e re-aplicá-lo novamente sempre que necessário 🥳
+
+- 5.6. Por fim, **revise e valide** as modificações dos snippets aplicados nos arquivos `pom.xml` e `application.yaml`. Embora o build e bateria de testes passem, é comum encontrar erros de indentação ou formatação após o merge dos snippets. Aqui, você pode utilizar sua IDE ou mesmo o próprio Git com o comando abaixo:
+
+    ```sh
+    # dentro do diretório "porpcorn-demo-teste"
+    git diff
+    ```
+
+6. Agora que tudo está funcionando como esperado. Vamos explorar o uso de 2 hooks especiais desenhados para lidar com edição de XML e YAML e entender suas diferenças com o hook `edit` que utilizamos anteriormente. Portanto, siga os passos abaixo:
+
+- 6.1. Dentro do arquivo `plugin.yaml`, substitua (ou comente) o hook `edit` do arquivo `pom.xml` pelo hook `edit-xml` especificado no código abaixo:
+
+    ```yaml
+    hooks:
+        ##
+        # Edit pom.xml
+        # (Using hook type=edit-xml)
+        ##
+        - type: edit-xml
+            trigger: after-render 
+            path: pom.xml
+            encoding: UTF-8
+            changes:
+            - xpath: .//dependencies
+                append:
+                snippet: snippets/snippet-pom.xml.jinja
+                when:
+                not-exists: "./dependencies/dependency/artifactId[.='spring-boot-starter-actuator']/.."
+    ```
+
+- 6.2. Agora, faça o mesmo para o hook `edit` do arquivo `application.yaml`. Substitua ele pelo hook `edit-yaml` como abaixo:
+
+    ```yaml
+    hooks:
+        ##
+        # Edit application.yaml
+        # (Using hook type=edit-yaml)
+        ##
+        - type: edit-yaml
+        path: src/main/resources/application.yaml
+        trigger: after-render
+        indent: 4
+        encoding: UTF-8
+        changes:
+            - yamlpath: "$"
+            update:
+                snippet: snippets/snippet-application.yaml.jinja
+            when:
+                not-exists: "$.management.endpoints"
+    ```
+
+- 6.3. Agora, vamos resetar o conteúdo do diretório `popcorn-demo-teste`, aplicar o plugin novamente e ver o resultado:
+
+    ```sh
+    # reseta modificações do "porpcorn-demo-teste"
+    git reset --hard HEAD ; git clean -fd 
+
+    # aplica o plugin
+    stk apply plugin ../popcorn-studio/popcorn-springboot-actuator-plugin
+
+    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    ./mvnw clean test
+    ```
+
+- 6.4. E claro, não esqueça de **revisar e validar** as modificações dos snippets aplicados nos arquivos `pom.xml` e `application.yaml`. Aqui, você pode utilizar tanto sua IDE preferida quanto o próprio Git com o comando abaixo:
+
+    ```sh
+    # dentro do diretório "porpcorn-demo-teste"
+    git diff
+    ```
 
 
 
