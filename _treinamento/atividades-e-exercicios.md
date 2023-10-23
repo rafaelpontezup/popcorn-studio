@@ -792,27 +792,27 @@ spec:
         # (Using hook type=edit)
         ##
         - type: edit
-        path: pom.xml
-        trigger: after-render    
-        changes:
+          path: pom.xml
+          trigger: after-render    
+          changes:
             - search:
-                string: "</dependencies>"
-                insert-before:
+              string: "</dependencies>"
+              insert-before:
                 snippet: snippets/snippet-pom.xml.jinja
-                when:
+              when:
                 not-exists-snippet: snippets/snippet-pom.xml.jinja
         ##
         # Edit application.yaml
         # (Using hook type=edit)
         ##
         - type: edit
-        path: src/main/resources/application.yaml
-        trigger: after-render    
-        changes:
+          path: src/main/resources/application.yaml
+          trigger: after-render    
+          changes:
             - insert:
-                line: -1
-                snippet: snippets/snippet-application.yaml.jinja
-                when:
+              line: -1
+              snippet: snippets/snippet-application.yaml.jinja
+              when:
                 not-exists: "management:"
     ```
 
@@ -864,14 +864,14 @@ spec:
         # (Using hook type=edit-xml)
         ##
         - type: edit-xml
-            trigger: after-render 
-            path: pom.xml
-            encoding: UTF-8
-            changes:
+          trigger: after-render 
+          path: pom.xml
+          encoding: UTF-8
+          changes:
             - xpath: .//dependencies
-                append:
+              append:
                 snippet: snippets/snippet-pom.xml.jinja
-                when:
+              when:
                 not-exists: "./dependencies/dependency/artifactId[.='spring-boot-starter-actuator']/.."
     ```
 
@@ -884,15 +884,15 @@ spec:
         # (Using hook type=edit-yaml)
         ##
         - type: edit-yaml
-        path: src/main/resources/application.yaml
-        trigger: after-render
-        indent: 4
-        encoding: UTF-8
-        changes:
+          path: src/main/resources/application.yaml
+          trigger: after-render
+          indent: 4
+          encoding: UTF-8
+          changes:
             - yamlpath: "$"
-            update:
+              update:
                 snippet: snippets/snippet-application.yaml.jinja
-            when:
+              when:
                 not-exists: "$.management.endpoints"
     ```
 
