@@ -2,7 +2,7 @@ schema-version: v2
 kind: plugin
 metadata:
   name: popcorn-springboot-data-jpa-plugin
-  display-name: popcorn-springboot-data-jpa-plugin
+  display-name: Spring Boot Data JPA plugin
   description: Habilta microsserviço com persistência em bancos de dados relacionais com Spring Data JPA e Hibernate
   version: 0.0.1
   picture: plugin.png
