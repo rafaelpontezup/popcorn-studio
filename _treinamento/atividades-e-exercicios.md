@@ -1622,7 +1622,7 @@ spec:
 
 8. Vamos aproveitar as variáveis globais dos plugins já aplicados para melhorarmos a experiência de uso do nosso plugin. Para isso, siga os passos:
 
-- 8.1. No arquivo `plugin.yaml` do nosso plugin `popcorn-springboot-base-plugin`, mova os inputs `project_base_package` e `project_base_package_dir` da sessão `computed-inputs` para a nova sessão de `global-computed-inputs`, como abaixo:
+- 8.1. No arquivo `plugin.yaml` do nosso plugin `popcorn-springboot-base-plugin` (**perceba que é o plugin base**), mova os inputs `project_base_package` e `project_base_package_dir` da sessão `computed-inputs` para a nova sessão de `global-computed-inputs`, como abaixo:
 
     ```yaml
     spec:
