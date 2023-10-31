@@ -18,24 +18,20 @@ spec:
   repository: git@github.com:rafaelpontezup/popcorn-studio.git
   technologies: # Ref: https://docs.stackspot.com/content-creator/studio/yaml-files/plugin-yaml/#technologies
     - Api
+    - Java
+    - Spring Boot
   stk-projects-only: false
   inputs:
-    - label: Type name of your resource
-      name: resource
-      type: text
-      required: true
-      default: Client
-      pattern: '([A-Z][a-z]+)+'
-      help: 'Inform your resource name (e.g.: Client)'
-    - label: Choose http method of new endpoint
-      name: method
+    - label: Escolha um banco de dados relacional (RDBMS)
+      name: database_name
       type: text
       items:
-        - GET
-        - POST
-        - PUT
-        - DELETE
-        - PATCH
-      default: GET
-      required: true
-      help: 'Inform the method of the endpoint (e.g.: post or delete)'
+        - H2
+        - PostgreSQL
+      default: H2
+      help: Se você não possui infraestrutura pronta, você pode escolher o H2 como banco em memória
+    - label: Informe o pacote base do seu projeto
+      name: base_package
+      type: text
+      default: br.com.zup.popcornstudio
+      help: Pacote base raiz (group_id + artifact_id)
