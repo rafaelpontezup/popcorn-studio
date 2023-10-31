@@ -1563,4 +1563,47 @@ spec:
     ./mvnw clean test
     ```
 
-- 7. 
+7. Agora, vamos adicionar suporte a Docker-Compose no projeto, dessa forma o desenvolvedor(a) poderá construir a aplicação localmente. Para isso, siga os passos abaixo:
+
+- 7.1. Dentro do diretório `snippets`, crie o diretório `docker-postgresql`;
+
+- 7.2. Dentro do diretório `docker-postgresql`, crie o arquivo `docker-compose.yaml` com o seguinte conteúdo:
+
+    ```yaml
+    version: '3.8'
+
+    services:
+    postgres:
+        image: postgres:14.5
+        restart: unless-stopped
+        ports:
+        - "5432:5432"
+        environment:
+        POSTGRES_DB: ${POSTGRES_USER:-dev_db}
+        POSTGRES_USER: ${POSTGRES_USER:-postgres}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+        volumes:
+        - postgres-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+
+    volumes:
+    postgres-data: # named volumes can be managed easier using docker-compose
+        driver: local
+    ```
+
+- 7.3. Por fim, no arquivo `plugin.yaml`, adicione um novo hook do tipo `render-templates` para renderizar nosso arquivo `docker-compose.yaml`, mas desta vez condionado a renderizar somente para o banco de dados `PostgreSQL`:
+
+    ```yaml
+    hooks:
+        # ...outros hooks
+
+        ##
+        # Create or edit docker-compose.yaml
+        ##
+        - type: render-templates
+          trigger: after-render
+          path: snippets/docker-postgresql
+          condition:
+            variable: database_name_formatted
+            operator: ==
+            value: postgresql
+    ```
