@@ -1590,7 +1590,7 @@ spec:
         driver: local
     ```
 
-- 7.3. Por fim, no arquivo `plugin.yaml`, adicione um novo hook do tipo `render-templates` para renderizar nosso arquivo `docker-compose.yaml`, mas desta vez condionado a renderizar somente para o banco de dados `PostgreSQL`:
+- 7.3. No arquivo `plugin.yaml`, adicione um novo hook do tipo `render-templates` para renderizar nosso arquivo `docker-compose.yaml`, mas desta vez condionado a renderizar somente para o banco de dados `PostgreSQL`:
 
     ```yaml
     hooks:
@@ -1606,4 +1606,55 @@ spec:
             variable: database_name_formatted
             operator: ==
             value: postgresql
+    ```
+- 7.4. Por fim, para ter certeza que tudo está funcionando como esperado, vamos testar nosso plugin para **os 2 bancos de dados: H2 e PostgreSQL**. Portanto, dentro do diretório de testes do plugin (`porpcorn-demo-teste`) execute os comandos abaixo para cada banco:
+
+    ```sh
+    # reseta modificações do "porpcorn-demo-teste"
+    git reset --hard HEAD ; git clean -fd
+
+    # aplica o plugin
+    stk apply plugin ../popcorn-studio/popcorn-springboot-data-jpa-plugin
+
+    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    ./mvnw clean test
+    ```
+
+8. Vamos aproveitar as variáveis globais dos plugins já aplicados para melhorarmos a experiência de uso do nosso plugin. Para isso, siga os passos:
+
+- 8.1. No arquivo `plugin.yaml` do nosso plugin `popcorn-springboot-base-plugin`, mova os inputs `project_base_package` e `project_base_package_dir` da sessão `computed-inputs` para a nova sessão de `global-computed-inputs`, como abaixo:
+
+    ```yaml
+    spec:
+        # ...
+        computed-inputs:
+            # ...
+        global-computed-inputs:
+            project_base_package: "{{project_group_id}}.{{project_artifact_id_sanitized}}"
+            project_base_package_dir: "{{project_base_package | group_id_folder}}"
+    ```
+
+- 8.2. Agora no nosso plugin, dentro do `plugin.yaml`, remova o input `project_base_package_dir` da sessão `computed-inputs`, afinal, este input será herdado do plugin `popcorn-springboot-base-plugin`;
+
+- 8.3. Aproveitando, torne o input do banco de dados selecionado **global**, assim ele poderá ser herdado em plugins que venham a ser aplicados no futuro. Para isso, basta adicionar a propriedade `global: true` no nosso input:
+
+    ```yaml
+    inputs:
+        - label: Escolha um banco de dados relacional (RDBMS)
+          name: database_name
+          # ...outras propriedades
+          global: true
+    ```
+
+- 8.4. Por fim, para ter certeza que tudo está funcionando como esperado, vamos testar nosso plugin para **os 2 bancos de dados: H2 e PostgreSQL**. Portanto, dentro do diretório de testes do plugin (`porpcorn-demo-teste`) execute os comandos abaixo para cada banco:
+
+    ```sh
+    # reseta modificações do "porpcorn-demo-teste"
+    git reset --hard HEAD ; git clean -fd
+
+    # aplica o plugin
+    stk apply plugin ../popcorn-studio/popcorn-springboot-data-jpa-plugin
+
+    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    ./mvnw clean test
     ```
