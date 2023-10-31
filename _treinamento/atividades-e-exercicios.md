@@ -14,6 +14,9 @@ Estes são as atividades e exercicíos de cada módulo que iremos estudar e trei
 
 3. [Módulo 3: Habilitando capacidade de monitoramento e health checking](#módulo-3-habilitando-capacidade-de-monitoramento-e-health-checking)
 
+4. [Módulo 4: Habilitando capacidade de persistência em bancos de dados relacionais](#módulo-4-habilitando-capacidade-de-persistência-em-bancos-de-dados-relacionais)
+
+
 ## Módulo 1: Introdução a StackSpot
 
 Neste módulo criaremos nossa conta personal na Stackspot, instalaremos a CLI na nossa máquina e por fim faremos o login na nossa conta pela CLI.
@@ -696,6 +699,7 @@ stk create plugin popcorn-springboot-actuator-plugin
 ```sh
 code .
 ```
+
 3. Agora vamos fazer as configurações básicas do nosso plugin. Para isso, dentro do diretório `popcorn-springboot-actuator-plugin`, abra o arquivo `plugin.yaml` e edite os atributos `display-name`, `description` e `technologies` como abaixo:
 
 ```yaml
@@ -713,7 +717,7 @@ spec:
         - Spring Boot
 ```
 
-4. Aproveitando que estamos no arquivo `plugin.yaml`, vamos adicionar um input para solifitar os endpoints que o usuário gostaria de expor no microsserviço. Dessa forma, siga os passos:
+4. Aproveitando que estamos no arquivo `plugin.yaml`, vamos adicionar um input para solicitar os endpoints que o usuário gostaria de expor no microsserviço. Dessa forma, siga os passos:
 
 - 4.1. Adicione o `input` para solicitar quais endpoints o usuário deseja que o plugin exponha no microsserviço:
 
@@ -955,10 +959,76 @@ spec:
 - 9.4. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
 
 
+## Módulo 4: Habilitando capacidade de persistência em bancos de dados relacionais
 
+Neste módulo criaremos um novo plugin para habilitar a capacidade de persistência em banco de dados relacional dos nossos microsserviços. Por se tratar do ecossistema Spring Boot, utilizaremos o módulo Spring Data JPA com Hibernate.
 
+Também adicionaremos a dependência da biblioteca TestContainers para permitir levantar localmente nosso banco de dados relacional através de containers Docker.
 
+### Exercícios
 
+1. Primeiramente, dentro do diretório do nosso estúdio `popcorn-studio`, crie um novo plugin com o nome `popcorn-springboot-data-jpa-plugin` com o comando a abaixo e responda as questões solicitadas pela CLI:
+
+```sh
+stk create plugin popcorn-springboot-data-jpa-plugin
+```
+
+2. Ainda dentro do diretório do estúdio, abra-o com seu editor de texto preferido. Se estiver utilizando o **Visual Studio Code (VsCode)**, basta executar o comando abaixo dentro do diretório:
+
+```sh
+code .
+```
+
+3. Agora vamos fazer as configurações básicas do nosso plugin. Para isso, dentro do diretório `popcorn-springboot-actuator-plugin`, abra o arquivo `plugin.yaml` e edite os atributos `display-name`, `description` e `technologies` como abaixo:
+
+```yaml
+metadata:
+  display-name: Spring Boot Data JPA plugin
+  description: Habilta microsserviço com persistência em bancos de dados relacionais com Spring Data JPA e Hibernate
+
+# ...
+
+spec:
+    # ...
+    technologies:
+        - Api
+        - Java
+        - Spring Boot
+```
+
+4. Ainda no arquivo `plugin.yaml`, vamos adicionar os inputs para perguntar ao usuário qual banco de dados será utilizado e qual pacote base (*base package*) utilizado no projeto. Dessa forma, siga os passos:
+
+- 4.1. Adicione os `input`'s para solicitar o banco de dados e o pacote base do projeto:
+
+    ```yaml
+    inputs:
+        - label: Escolha um banco de dados relacional (RDBMS)
+          name: database_name
+          type: text
+          items:
+            - H2
+            - PostgreSQL
+          default: H2
+          help: Se você não possui infraestrutura pronta, você pode escolher o H2 como banco em memória
+        - label: Informe o pacote base do seu projeto
+          name: project_base_package
+          type: text
+          required: true
+          default: br.com.zup.popcornstudio.demo
+          help: Pacote base raiz (group_id + artifact_id)
+    ```
+
+- 4.2. Agora, também adicione a sessão `computed-input` para formatar os inputs entrados pelo usuário (eles serão utilizados nos snippets que criaremos mais a frente):
+
+    ```yaml
+    computed-inputs:
+        database_name_formatted: "{{database_name | lower}}"
+        project_base_package_dir: "{{project_base_package | group_id_folder}}"
+    ```
+
+    > ⚠️ **Atenção**: A propriedade `computed-inputs` deve estar na mesma hierarquia da propriedade `inputs`. Ou seja, no mesmo nível de indentação.
+
+- 4.3. 
 
 
 
