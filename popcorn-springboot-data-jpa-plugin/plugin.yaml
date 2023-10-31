@@ -31,12 +31,14 @@ spec:
       default: H2
       help: Se você não possui infraestrutura pronta, você pode escolher o H2 como banco em memória
     - label: Informe o pacote base do seu projeto
-      name: base_package
+      name: project_base_package
       type: text
-      default: br.com.zup.popcornstudio
+      required: true
+      default: br.com.zup.popcornstudio.demo
       help: Pacote base raiz (group_id + artifact_id)
   computed-inputs:
     database_name_formatted: "{{database_name | lower}}"
+    project_base_package_dir: "{{project_base_package | group_id_folder}}"
   
   hooks:
     ##
@@ -78,3 +80,20 @@ spec:
               snippet: snippets/snippet-application-test.yaml.jinja
             when:
               not-exists: "datasource:"
+    ##
+    # Create or edit docker-compose.yaml
+    ##
+    - type: render-templates
+      trigger: after-render
+      path: snippets/docker-postgresql
+      condition:
+        variable: database_name_formatted
+        operator: ==
+        value: postgresql
+
+    ##
+    # Create samples code
+    ##
+    - type: render-templates
+      trigger: after-render
+      path: snippets/samples
