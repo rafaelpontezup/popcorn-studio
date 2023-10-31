@@ -1028,7 +1028,539 @@ spec:
 
     > ⚠️ **Atenção**: A propriedade `computed-inputs` deve estar na mesma hierarquia da propriedade `inputs`. Ou seja, no mesmo nível de indentação.
 
-- 4.3. 
+- 4.3. Lembre-se de validar seu arquivo `plugin.yaml` com o comando abaixo:
 
+    ```sh
+    # dentro do diretorio do plugin
+    stk validate plugin
+    ```
 
+5. Agora, vamos criar os snippets de código que serão renderizados e utilizados no microsserviço existente para habilitar a capacidade de persistência com Spring Data JPA para os bancos de dados H2 e PostgreSQL. Para isso, siga os passos abaixo:
 
+- 5.1. Na raiz do plugin, crie o diretório `snippets`. É nele que colocaremos todos os snippets de código do plugin;
+
+- 5.2. Agora, dentro do diretório `snippets`, crie o arquivo de snippet que será responsável por adicionar a dependência do Spring Boot Actuator no projeto. O nome do arquivo deve ser `snippet-pom.xml.jinja` e conterá o seguinte pedaço de código (atenção a indentação e quebras de linhas):
+
+    ```xml
+        
+            <!-- *********************** -->
+            <!-- Spring Data JPA with {{database_name}} -->
+            <!-- *********************** -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-jpa</artifactId>
+            </dependency>
+
+    {% if database_name_formatted == 'h2' %}
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <scope>runtime</scope>
+            </dependency>
+    {% endif %}
+    {% if database_name_formatted == 'postgresql' %}
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <scope>runtime</scope>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-testcontainers</artifactId>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <scope>test</scope>
+            </dependency>
+    {% endif %}
+    ```
+
+    > ⚠️ **Atenção**: Perceba que estamos utilizado estruturas de fluxos do Jinja, como `if-endif` para decidir qual trecho de código será renderizado de acordo com os inputs do usuário.
+
+- 5.3. Em seguida, ainda no diretório `snippets`, crie outro arquivo de snippet, desta vez para configurar as propriedades de acesso ao banco de dados e otimizações de performance do pool de conexões e Hibernate. O nome do arquivo deve ser `snippet-application.yaml.jinja` (atenção a indentação, quebras de linhas e código Jinja):
+
+    ```yaml
+        ##
+        # DataSource and JPA/Hibernate ({{database_name}})
+        ##
+    {% if database_name_formatted == 'h2' %}
+        datasource:
+            driverClassName: org.h2.Driver
+            url: jdbc:h2:mem:dev_db
+            username: sa
+            password: sa
+            hikari:
+                auto-commit: false
+                maximum-pool-size: 20
+                connection-timeout: 10000       # 10s
+                validation-timeout: 5000        # 5s
+                max-lifetime: 1800000           # 30min
+                leak-detection-threshold: 60000 # 1min
+        h2:
+            console: # http://localhost:8080/h2-console/
+                enabled: true
+    {% endif %}
+    {% if database_name_formatted == 'postgresql' %}
+        datasource:
+            driverClassName: org.postgresql.Driver
+            url: jdbc:postgresql://localhost:5432/dev_db
+            username: postgres
+            password: postgres
+            hikari:
+                auto-commit: false
+                maximum-pool-size: 20
+                connection-timeout: 10000       # 10s
+                validation-timeout: 5000        # 5s
+                max-lifetime: 1800000           # 30min
+                leak-detection-threshold: 60000 # 1min
+    {% endif %}
+        jpa:
+            generate-ddl: true
+            show-sql: true
+            open-in-view: false
+            hibernate:
+                ddl-auto: update
+            properties:
+                hibernate:
+                    format_sql: true
+                    jdbc:
+                        time_zone: UTC
+                        batch_size: 15
+                        order_inserts: true
+                        order_updates: true
+                        batch_versioned_data: true
+                    connection:
+                        provider_disables_autocommit: true
+                    query:
+                        in_clause_parameter_padding: true
+                        fail_on_pagination_over_collection_fetch: true
+                        plan_cache_max_size: 4096
+
+    ```
+
+    > ⚠️ **Atenção**: Por estarmos modificando conteúdo de formato YAML, como `application.yaml` ou `application-test.yaml`, é muito importante ter uma atenção redobrada com a formatação e indentação do código YAML que será inserido ou alterado pelo plugin, especialmente em snippets de código que serão mergeados em arquivos existentes, grandes e complexos. Qualquer erro de indentação pode gerar erros no startup da aplicação ou, pior, ser ignorada silenciosamente pela aplicação como se nada tivesse acontecido.
+
+- 5.4. Agora faremos o mesmo para o arquivo de configuração de testes do Spring. Crie um novo arquivo de snippet com o nome `snippet-application.yaml.jinja` (atenção a indentação, quebras de linhas e código Jinja):
+
+    ```yaml
+        ##
+        # DataSource and JPA/Hibernate ({{database_name}})
+        ##
+    {% if database_name_formatted == 'h2' %}
+        datasource:
+            url: jdbc:h2:mem:test_db
+            username: sa
+        h2:
+            console:
+                enabled: false
+    {% endif %}
+    {% if database_name_formatted == 'postgresql' %}
+        datasource:
+            driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+            url: jdbc:tc:postgresql:14.5:////test_db
+    {% endif %}
+
+    ```
+
+- 5.5. O próximo passo é configurar o plugin para utilizar nossos snippets para mergear os arquivos `pom.xml`,  `application.yaml` e `application-test.yaml` da aplicação. Para isso, adicione os hooks de edição (`edit`) no arquivo `plugin.yaml`:
+
+    ```yaml
+    hooks:
+        ##
+        # Edit pom.xml
+        ##
+        - type: edit
+          path: pom.xml
+          trigger: after-render    
+          changes:
+            - search:
+                string: "</dependencies>"
+                insert-before:
+                    snippet: snippets/snippet-pom.xml.jinja
+                when:
+                    not-exists-snippet: snippets/snippet-pom.xml.jinja
+        ##
+        # Edit application.yaml
+        ##
+        - type: edit
+          path: src/main/resources/application.yaml
+          trigger: after-render    
+          changes:
+            - search:
+                string: "spring:"
+                insert-after:
+                    snippet: snippets/snippet-application.yaml.jinja
+                when:
+                    not-exists: "datasource:"
+        ##
+        # Edit application-test.yaml
+        ##
+        - type: edit
+          path: src/test/resources/application-test.yaml
+          trigger: after-render    
+          changes:
+            - search:
+                string: "spring:"
+                insert-after:
+                    snippet: snippets/snippet-application-test.yaml.jinja
+                when:
+                    not-exists: "datasource:"
+    ```
+
+    > ⚠️ **Atenção**: A propriedade `hooks` deve estar na mesma hierarquia das propriedades `inputs` e `computed-inputs`. Ou seja, no mesmo nível de indentação.
+
+- 5.6. Lembre-se de validar seu arquivo `plugin.yaml` com o comando abaixo:
+
+    ```sh
+    # dentro do diretorio do plugin
+    stk validate plugin
+    ```
+
+- 5.7. Agora, vamos resetar o conteúdo do diretório `popcorn-demo-teste`, aplicar o plugin novamente e ver o resultado:
+
+    ```sh
+    # reseta modificações do "porpcorn-demo-teste"
+    git reset --hard HEAD ; git clean -fd 
+
+    # aplica o plugin
+    stk apply plugin ../popcorn-studio/popcorn-springboot-data-jpa-plugin
+
+    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    ./mvnw clean test
+    ```
+
+    > 💡 **Dica**: Durante a construção e aplicação de plugins em projetos existentes, é comum encontrarmos erros de renderização de templates e snippets, o que muitas vezes pode ser trabalhoso ou impossível de desfazer manualmente. Para evitar essa fadiga, podemos tirar proveito do Git.
+    > 
+    > Para isso, basta que o projeto existente esteja versionado pelo Git e tenha todo seu conteúdo comitado (ao menos localmente). Em seguida, basta executar o comando de reset do Git abaixo:
+    > 
+    > ```sh
+    > git reset --hard HEAD ; git clean -fd
+    > ```
+    >
+    > Pronto! Agora basta corrigir o plugin e re-aplicá-lo novamente sempre que necessário 🥳
+
+- 5.8. Por fim, **revise e valide** as modificações dos snippets aplicados nos arquivos `pom.xml`, `application.yaml` e `application-test.yaml`. Embora o build e bateria de testes passem, é comum encontrar erros de indentação ou formatação após o merge dos snippets. Aqui, você pode utilizar sua IDE ou mesmo o próprio Git com o comando abaixo:
+
+    ```sh
+    # dentro do diretório "porpcorn-demo-teste"
+    git diff
+    ```
+
+6. Com a customização de dependências e configuração da aplicação feitas e funcionando, o próximo passo é adicionar **sample code** de acesso ao banco de dados (seguindo nossos padrões de design e arquitetura) para ajudar os desenvolvedores(as) nos primeiros passos. Dessa forma, siga os passos abaixo:
+
+- 6.1. Primeiramente, para facilitar a manipulação e identificação de código de exemplo (*sample code*), vamos criar os seguintes pacotes no classpath da aplicação:
+
+    - Dentro do diretório `snippets`, crie um novo diretório chamado `samples`;
+    - Dentro do diretório `samples`, crie a estrutura de diretórios `src/main/java/{{project_base_package_dir}}/samples/books`
+    - Crie a mesma estrutura para source folder `src/test/java/{{project_base_package_dir}}/samples/books`;
+
+- 6.2. Em seguida, crie a entidade de exemplo `Book.java` dentro do pacote `samples.books` localizado na source folder `src/main` com o conteúdo abaixo:
+
+    ```java
+    package {{project_base_package}}.samples.books;
+
+    import jakarta.persistence.*;
+    import jakarta.validation.constraints.NotBlank;
+    import jakarta.validation.constraints.Size;
+    import org.hibernate.validator.constraints.ISBN;
+
+    import java.util.Objects;
+
+    import static org.hibernate.validator.constraints.ISBN.Type.ISBN_13;
+
+    @Entity
+    @Table(
+        uniqueConstraints = {
+            @UniqueConstraint(name = "uk_isbn", columnNames = "isbn")
+        }
+    )
+    public class Book {
+
+        @Id
+        @GeneratedValue
+        private Long id;
+
+        @NotBlank
+        @ISBN(type = ISBN_13)
+        @Column(nullable = false, length = 13)
+        private String isbn;
+
+        @NotBlank
+        @Size(max = 120)
+        @Column(nullable = false, length = 120)
+        private String title;
+
+        @NotBlank
+        @Size(max = 4000)
+        @Column(nullable = false, length = 4000)
+        private String description;
+
+        @Version
+        private int version;
+
+        /**
+         * @deprecated Exclusive use of Hibernate
+         */
+        @Deprecated
+        public Book() {}
+
+        public Book(@NotBlank @ISBN String isbn,
+                    @NotBlank @Size(max = 120) String title,
+                    @NotBlank @Size(max = 4000) String description) {
+            this.isbn = isbn;
+            this.title = title;
+            this.description = description;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Book book = (Book) o;
+            return Objects.equals(isbn, book.isbn);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(isbn);
+        }
+
+        @Override
+        public String toString() {
+            return "Book{" +
+                    "id=" + id +
+                    ", isbn='" + isbn + '\'' +
+                    ", title='" + title + '\'' +
+                    ", description='" + description + '\'' +
+                    '}';
+        }
+    }
+    ```
+
+- 6.3. Ainda dentro do pacote `samples.books`, crie a classe de repositório `BookRepository.java` com o seguinte conteúdo:
+
+    ```java
+    package {{project_base_package}}.samples.books;
+
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.stereotype.Repository;
+    import org.springframework.transaction.annotation.Transactional;
+
+    import java.util.Optional;
+
+    /**
+     * Since most repository calls are for read operations, it's good practice
+     * to define, at class level, that transactions are read-only by default.
+     * 
+     * Reference: https://vladmihalcea.com/spring-transaction-best-practices/
+     */
+    @Repository
+    @Transactional(readOnly = true)
+    public interface BookRepository extends JpaRepository<Book, Long> {
+
+        public Optional<Book> findByIsbn(String isbn);
+    }
+    ```
+
+- 6.4. Em seguida, dentro do pacote `samples.books` da source folder `src/test`, crie a classe de testes de integração para nosso repositório com o nome `BookRepositoryTest.java` (repare no sufixo `Test`) com o seguinte conteúdo:
+
+    ```java
+    package {{project_base_package}}.samples.books;
+
+    import jakarta.validation.ConstraintViolation;
+    import jakarta.validation.ConstraintViolationException;
+    import org.junit.jupiter.api.BeforeEach;
+    import org.junit.jupiter.api.DisplayName;
+    import org.junit.jupiter.api.Test;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.boot.test.context.SpringBootTest;
+    import org.springframework.dao.DataIntegrityViolationException;
+    import org.springframework.test.context.ActiveProfiles;
+    import org.springframework.transaction.TransactionSystemException;
+
+    import java.util.Optional;
+
+    import static org.assertj.core.api.Assertions.*;
+    import static org.assertj.core.api.InstanceOfAssertFactories.iterable;
+    import static org.assertj.core.groups.Tuple.tuple;
+    import static org.junit.jupiter.api.Assertions.assertEquals;
+    import static org.junit.jupiter.api.Assertions.assertThrows;
+
+    @SpringBootTest
+    @ActiveProfiles("test")
+    class BookRepositoryTest {
+
+        @Autowired
+        private BookRepository repository;
+
+        @BeforeEach
+        void setUp() {
+            repository.deleteAll();
+        }
+
+        @Test
+        @DisplayName("should save a book")
+        void t1() {
+            // scenario
+            Book book = new Book("9788550800653", "Domain-Driven Design", "DDD - The blue book");
+
+            // action
+            repository.save(book);
+
+            // validation
+            assertThat(repository.findAll())
+                    .hasSize(1)
+                    .usingRecursiveFieldByFieldElementComparator()
+                    .containsExactly(book)
+                    ;
+        }
+
+        @Test
+        @DisplayName("should not save a book with invalid parameters")
+        void t2() {
+            // scenario
+            Book book = new Book("97885-invalid", "a".repeat(121), "");
+
+            // action and validation
+            assertThatThrownBy(() -> {
+                repository.save(book);
+            })
+                    .isInstanceOf(TransactionSystemException.class)
+                    .hasRootCauseInstanceOf(ConstraintViolationException.class)
+                    .getRootCause()
+                    .extracting("constraintViolations", as(iterable(ConstraintViolation.class)))
+                    .extracting(
+                            t -> t.getPropertyPath().toString(),
+                            ConstraintViolation::getMessage
+                    )
+                    .containsExactlyInAnyOrder(
+                            tuple("isbn", "invalid ISBN"),
+                            tuple("title", "size must be between 0 and 120"),
+                            tuple("description", "must not be blank")
+                    )
+            ;
+            // Tip: Try always to verify the side effects
+            assertEquals(0, repository.count());
+        }
+
+        @Test
+        @DisplayName("should not save a book when a book with same isbn already exists")
+        void t3() {
+            // scenario
+            String isbn = "9788550800653";
+            Book ddd = new Book(isbn, "Domain-Driven Design", "DDD - The blue book");
+
+            // action
+            repository.save(ddd);
+
+            // validation
+            assertThrows(DataIntegrityViolationException.class, () -> {
+                Book cleanCode = new Book(isbn, "Clean Code", "Learn how to write clean code with Uncle Bob");
+                repository.save(cleanCode);
+            });
+            // Tip: Try always to verify the side effects
+            assertEquals(1, repository.count());
+        }
+
+        @Test
+        @DisplayName("should find a book by isbn")
+        void t4() {
+            // scenario
+            String isbn = "9788550800653";
+            Book book = new Book(isbn, "Domain-Driven Design", "DDD - The blue book");
+            repository.save(book);
+
+            // action
+            Optional<Book> optionalBook = repository.findByIsbn(isbn);
+
+            // validation
+            assertThat(optionalBook)
+                    .isPresent().get()
+                    .usingRecursiveComparison()
+                    .isEqualTo(book)
+                    ;
+        }
+
+        @Test
+        @DisplayName("should not find a book by isbn")
+        void t5() {
+            // scenario
+            Book book = new Book("9788550800653", "Domain-Driven Design", "DDD - The blue book");
+            repository.save(book);
+
+            // action
+            String notExistingIsbn = "1234567890123";
+            Optional<Book> optionalBook = repository.findByIsbn(notExistingIsbn);
+
+            // validation
+            assertThat(optionalBook).isEmpty();
+        }
+
+    }
+    ```
+
+- 6.5. Certifique-se que o resultado final do diretório `snippets` do nosso plugin deve ser semelhante a este:
+
+    ```
+    snippets
+        ├── samples
+        │   └── src
+        │       ├── main
+        │       │   └── java
+        │       │       └── {{project_base_package_dir}}
+        │       │           └── samples
+        │       │               └── books
+        │       │                   ├── Book.java
+        │       │                   └── BookRepository.java
+        │       └── test
+        │           └── java
+        │               └── {{project_base_package_dir}}
+        │                   └── samples
+        │                       └── books
+        │                           └── BookRepositoryTest.java
+        ├── snippet-application-test.yaml.jinja
+        ├── snippet-application.yaml.jinja
+        └── snippet-pom.xml.jinja
+    ```
+
+- 6.6. Agora, dentro do arquivo `plugin.yaml`, adicione o hook `render-templates` para renderizarmos nosso diretório de sample codes na aplicação:
+
+    ```yaml
+    hooks:
+        # ... outros hooks
+        
+        ##
+        # Create sample code
+        ##
+        - type: render-templates
+          trigger: after-render
+          path: snippets/samples
+    ```
+- 6.7. Por fim, para ter certeza que tudo está funcionando como esperado, vamos testar nosso plugin para **os 2 bancos de dados: H2 e PostgreSQL**. Portanto, dentro do diretório de testes do plugin (`porpcorn-demo-teste`) execute os comandos abaixo para cada banco:
+
+    ```sh
+    # reseta modificações do "porpcorn-demo-teste"
+    git reset --hard HEAD ; git clean -fd
+
+    # aplica o plugin
+    stk apply plugin ../popcorn-studio/popcorn-springboot-data-jpa-plugin
+
+    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    ./mvnw clean test
+    ```
+
+- 7. 
