@@ -1667,4 +1667,36 @@ spec:
 
 - 8.5. Por fim, dentro do novo projeto de testes (`porpcorn-demo-teste-2`), acesse o arquivo `.stk/stk.yaml` e verifique se os inputs globais foram preenchidos como esperado;
 
-9. 
+
+=========
+
+
+9. Agora, para consumir nosso novo plugin, precisamos publicá-lo no nosso Studio, adiciona-lo na Stack e por fim adiciona-lo na nossa Workspace. Dessa forma, siga os passos abaixo:
+
+- 9.1. Na linha de comando e dentro do diretório do plugin (`popcorn-springboot-actuator-plugin`), publique o plugin no estúdio que criamos no portal da StackSpot:
+
+    ```sh
+    stk publish plugin --studio popcorn-studio
+    ```
+
+- 9.2. Adicione o plugin na Stack existente;
+
+- 9.3. Crie um novo Starter semelhante ao anterior e adicione nosso novo plugin. Garanta que ele venha **depois** de todos os demais plugins;
+
+- 9.5. Adicione a nova versão da Stack a nossa Workspace;
+
+- 9.6. Ainda na Workspace, acesse a Stack e **configure o plugin** com inputs padrão e mandatórios que você entender que façam sentido;
+
+- 9.7. Ainda na Stack, **configure a action** `create-repo-github` com o valor padrão `public` como opcional;
+
+- 9.8. Ainda na Stack, **configure o Workflow** *Create-app* (Portal) anexando nossa action `create-repo-github` a evento *Before* do workflow;
+
+- 9.9. Por fim, crie uma aplicação usando nosso nova Stack e novo Starter;
+
+- 9.10. Faça o clone do repositório criado, e rode o build e bateria de testes via Maven:
+
+    ```sh
+    ./mvnw clean test
+    ```
+
+- 9.11. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
