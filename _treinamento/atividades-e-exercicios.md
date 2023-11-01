@@ -979,7 +979,7 @@ stk create plugin popcorn-springboot-data-jpa-plugin
 code .
 ```
 
-3. Agora vamos fazer as configurações básicas do nosso plugin. Para isso, dentro do diretório `popcorn-springboot-actuator-plugin`, abra o arquivo `plugin.yaml` e edite os atributos `display-name`, `description` e `technologies` como abaixo:
+3. Agora vamos fazer as configurações básicas do nosso plugin. Para isso, dentro do diretório `popcorn-springboot-data-jpa-plugin`, abra o arquivo `plugin.yaml` e edite os atributos `display-name`, `description` e `technologies` como abaixo:
 
 ```yaml
 metadata:
@@ -1018,7 +1018,7 @@ spec:
           help: Pacote base raiz (group_id + artifact_id)
     ```
 
-- 4.2. Agora, também adicione a sessão `computed-input` para formatar os inputs entrados pelo usuário (eles serão utilizados nos snippets que criaremos mais a frente):
+- 4.2. Agora, também adicione a sessão `computed-inputs` para preparar e formatar os inputs entrados pelo usuário (eles serão utilizados nos snippets que criaremos mais a frente):
 
     ```yaml
     computed-inputs:
@@ -1039,7 +1039,7 @@ spec:
 
 - 5.1. Na raiz do plugin, crie o diretório `snippets`. É nele que colocaremos todos os snippets de código do plugin;
 
-- 5.2. Agora, dentro do diretório `snippets`, crie o arquivo de snippet que será responsável por adicionar a dependência do Spring Boot Actuator no projeto. O nome do arquivo deve ser `snippet-pom.xml.jinja` e conterá o seguinte pedaço de código (atenção a indentação e quebras de linhas):
+- 5.2. Agora, dentro do diretório `snippets`, crie o arquivo de snippet que será responsável por adicionar a dependência do Spring Boot Data JPA no projeto e, de forma condicional, também as dependências do banco de dados selecionado pelo usuário. O nome do arquivo deve ser `snippet-pom.xml.jinja` e conterá o seguinte pedaço de código (atenção a indentação e quebras de linhas):
 
     ```xml
         
@@ -1085,7 +1085,7 @@ spec:
     {% endif %}
     ```
 
-    > ⚠️ **Atenção**: Perceba que estamos utilizado estruturas de fluxos do Jinja, como `if-endif` para decidir qual trecho de código será renderizado de acordo com os inputs do usuário.
+    > ⚠️ **Atenção**: Perceba que estamos utilizado estruturas de fluxos do Jinja, como `{% if-endif %}` para decidir qual trecho de código será renderizado de acordo com os inputs do usuário.
 
 - 5.3. Em seguida, ainda no diretório `snippets`, crie outro arquivo de snippet, desta vez para configurar as propriedades de acesso ao banco de dados e otimizações de performance do pool de conexões e Hibernate. O nome do arquivo deve ser `snippet-application.yaml.jinja` (atenção a indentação, quebras de linhas e código Jinja):
 
@@ -1669,7 +1669,7 @@ spec:
 
 9. Agora, para consumir nosso novo plugin, precisamos publicá-lo no nosso Studio, adiciona-lo na Stack e por fim adiciona-lo na nossa Workspace. Dessa forma, siga os passos abaixo:
 
-- 9.1. Na linha de comando e dentro do diretório do plugin (`popcorn-springboot-actuator-plugin`), publique o plugin no estúdio que criamos no portal da StackSpot:
+- 9.1. Na linha de comando e dentro do diretório do plugin (`popcorn-springboot-data-jpa-plugin`), publique o plugin no estúdio que criamos no portal da StackSpot:
 
     ```sh
     stk publish plugin --studio popcorn-studio
@@ -1677,7 +1677,7 @@ spec:
 
 - 9.2. Adicione o plugin na Stack existente;
 
-- 9.3. Crie um novo Starter semelhante ao anterior e adicione nosso novo plugin. Garanta que ele venha **depois** de todos os demais plugins;
+- 9.3. **Crie um novo Starter** semelhante ao anterior e **adicione nosso novo plugin**. Garanta que ele venha **depois** de todos os demais plugins;
 
 - 9.5. Adicione a nova versão da Stack a nossa Workspace;
 
@@ -1687,7 +1687,7 @@ spec:
 
 - 9.8. Ainda na Stack, **configure o Workflow** *Create-app* (Portal) anexando nossa action `create-repo-github` a evento *Before* do workflow;
 
-- 9.9. Por fim, crie uma aplicação usando nosso nova Stack e novo Starter;
+- 9.9. Por fim, crie uma aplicação usando nossa nova Stack e novo Starter;
 
 - 9.10. Faça o clone do repositório criado, e rode o build e bateria de testes via Maven:
 
