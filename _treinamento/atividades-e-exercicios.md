@@ -1697,4 +1697,4 @@ spec:
 
 - 9.11. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
 
-- 9.12. 🚀 **(opcional)** Melhore o nosso plugin de persistência adicionando suporte ao banco MySQL 8.x.
+10. 🚀 **(opcional)** Melhore o nosso plugin de persistência adicionando suporte ao banco MySQL 8.x.
