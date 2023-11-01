@@ -1667,10 +1667,6 @@ spec:
 
 - 8.5. Por fim, dentro do novo projeto de testes (`porpcorn-demo-teste-2`), acesse o arquivo `.stk/stk.yaml` e verifique se os inputs globais foram preenchidos como esperado;
 
-
-=========
-
-
 9. Agora, para consumir nosso novo plugin, precisamos publicá-lo no nosso Studio, adiciona-lo na Stack e por fim adiciona-lo na nossa Workspace. Dessa forma, siga os passos abaixo:
 
 - 9.1. Na linha de comando e dentro do diretório do plugin (`popcorn-springboot-actuator-plugin`), publique o plugin no estúdio que criamos no portal da StackSpot:
