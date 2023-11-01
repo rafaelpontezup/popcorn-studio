@@ -139,7 +139,7 @@ inputs:
       name: project_group_id
       type: text
       required: true
-      pattern: '^[a-zA-Z][a-zA-Z0-9_](\\.[a-zA-Z][a-zA-Z0-9_])*$'
+      pattern: '(^[a-zA-Z_\d.]*[a-zA-Z_\d]$)'
       default: "br.com.zup.popcornstudio"
     - label: Artifact_Id do Maven
       name: project_artifact_id
@@ -1622,7 +1622,7 @@ spec:
 
 8. Vamos aproveitar as variáveis globais dos plugins já aplicados para melhorarmos a experiência de uso do nosso plugin. Para isso, siga os passos:
 
-- 8.1. No arquivo `plugin.yaml` do nosso plugin `popcorn-springboot-base-plugin` (**perceba que é o plugin base**), mova os inputs `project_base_package` e `project_base_package_dir` da sessão `computed-inputs` para a nova sessão de `global-computed-inputs`, como abaixo:
+- 8.1. No arquivo `plugin.yaml` do plugin `popcorn-springboot-base-plugin` (**perceba que é o plugin base**), mova os inputs `project_base_package` e `project_base_package_dir` da sessão `computed-inputs` para a nova sessão de `global-computed-inputs`, como abaixo:
 
     ```yaml
     spec:
@@ -1634,7 +1634,7 @@ spec:
             project_base_package_dir: "{{project_base_package | group_id_folder}}"
     ```
 
-- 8.2. Agora no nosso plugin, dentro do `plugin.yaml`, remova o input `project_base_package_dir` da sessão `computed-inputs`, afinal, este input será herdado do plugin `popcorn-springboot-base-plugin`;
+- 8.2. Agora no **nosso plugin de persistência**, dentro do `plugin.yaml`, remova o input `project_base_package_dir` da sessão `computed-inputs`, afinal, este input será herdado do plugin `popcorn-springboot-base-plugin`;
 
 - 8.3. Aproveitando, torne o input do banco de dados selecionado **global**, assim ele poderá ser herdado em plugins que venham a ser aplicados no futuro. Para isso, basta adicionar a propriedade `global: true` no nosso input:
 
@@ -1646,15 +1646,25 @@ spec:
           global: true
     ```
 
-- 8.4. Por fim, para ter certeza que tudo está funcionando como esperado, vamos testar nosso plugin para **os 2 bancos de dados: H2 e PostgreSQL**. Portanto, dentro do diretório de testes do plugin (`porpcorn-demo-teste`) execute os comandos abaixo para cada banco:
+- 8.4. Para ter certeza que tudo está funcionando como esperado, precisamos criar uma nova aplicação de testes e **aplicar todos os plugins de novo**. Portanto, em outro diretório, execute os comandos a seguir:
 
     ```sh
-    # reseta modificações do "porpcorn-demo-teste"
-    git reset --hard HEAD ; git clean -fd
+    # cria novo diretorio de testes
+    mkdir porpcorn-demo-test-2
 
-    # aplica o plugin
+    # aplica o plugin base
+    stk apply plugin ../popcorn-studio/popcorn-springboot-base-plugin
+
+    # aplica o plugin actuator
+    stk apply plugin ../popcorn-studio/popcorn-springboot-actuator-plugin
+
+    # aplica o plugin data-jpa
     stk apply plugin ../popcorn-studio/popcorn-springboot-data-jpa-plugin
 
-    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    # valida conteúdo gerado
     ./mvnw clean test
     ```
+
+- 8.5. Por fim, dentro do novo projeto de testes (`porpcorn-demo-teste-2`), acesse o arquivo `.stk/stk.yaml` e verifique se os inputs globais foram preenchidos como esperado;
+
+9. 
