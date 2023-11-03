@@ -1867,4 +1867,6 @@ Aproveitando, você poderá continuar seus estudos e aprendizados nas seguintes 
 - [Guilda da StackSpot no Google Chat](https://chat.google.com/room/AAAA4zeJczo?cls=7)
 - [Curso da Handora: Empacote stacks de tecnologia através da Stackspot](https://handora.zup.com.br/treino-completo/12)
 
+Em caso de dúvidas não se acanhe, você pode entre em contato diretamente comigo via email ou Chat do Google através do meu usuário: [Rafael Ponte - rafael.ponte@zup.com.br](rafael.ponte@zup.com.br)
+
 Bons estudos e obrigado 👊🏻
