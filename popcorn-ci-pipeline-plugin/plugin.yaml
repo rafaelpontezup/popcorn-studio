@@ -4,7 +4,7 @@ metadata:
   name: popcorn-ci-pipeline-plugin
   display-name: CI Pipeline plugin
   description: Habilita suporte a pipeline de CI com Github Actions
-  version: 0.0.1
+  version: 0.0.2
   picture: plugin.png
 spec:
   type: app
