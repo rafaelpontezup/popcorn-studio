@@ -2,7 +2,7 @@ schema-version: v2
 kind: plugin
 metadata:
   name: popcorn-ci-pipeline-plugin
-  display-name: popcorn-ci-pipeline-plugin
+  display-name: CI Pipeline plugin
   description: Habilita suporte a pipeline de CI com Github Actions
   version: 0.0.1
   picture: plugin.png
