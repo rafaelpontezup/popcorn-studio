@@ -21,7 +21,7 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Prepare to uplaod JAR file 
+      - name: Prepare to upload application's JAR file 
         run: mkdir staging && cp target/*.jar staging
       
       - name: Upload application's JAR file
