@@ -18,6 +18,8 @@ Estes são as atividades e exercicíos de cada módulo que iremos estudar e trei
 
 5. [Módulo 5: Habilitando capacidade de pipeline de integração contínua (CI)](#módulo-5-habilitando-capacidade-de-pipeline-de-integração-contínua-ci)
 
+6. [Conclusão](#conclusão)
+
 
 ## Módulo 1: Introdução a StackSpot
 
@@ -1850,3 +1852,19 @@ spec:
 - 6.10. Por fim, faça o clone do repositório criado, rode o build e bateria de testes via Maven e, se desejar, importe o projeto na sua IDE favorita e comece o desenvolvimento do seu microsserviço 🥳;
 
 7. 🚀 **(opcional)** Melhore a DevEx (Developer Experience) da nossa Stack permitindo que o plugin de pipeline de CI herde o input `project_java_version` do plugin base;
+
+## Conclusão
+
+Parabéns se você chegou até aqui 👏🏻
+
+Se você treinou e explorou as atividades deste treinamento como esperado, você será capaz de criar e configurar estúdios, stacks e plugins com a StackSpot. A partir de agora, entendemos que você está apto(a) a definir, desenhar e implementar plugins de aplicação para acelerar o desenvolvimento e entrega de aplicações no seu time e para uso pessoal.
+
+Aproveitando, você poderá continuar seus estudos e aprendizados nas seguintes fontes de conhecimento:
+
+- [Documentação oficial da Stackspot](https://docs.stackspot.com/)
+- [Blog da Stackspot](https://www.stackspot.com/pt/blog)
+- [Canal de Youtube da Stackspot](https://www.youtube.com/@StackSpot/featured)
+- [Guilda da StackSpot no Google Chat](https://chat.google.com/room/AAAA4zeJczo?cls=7)
+- [Curso da Handora: Empacote stacks de tecnologia através da Stackspot](https://handora.zup.com.br/treino-completo/12)
+
+Bons estudos e obrigado 👊🏻
