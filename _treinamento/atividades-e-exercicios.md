@@ -1778,7 +1778,7 @@ spec:
 
     ```sh
     # dentro do diretório "templates"
-    mkdir -o .github/workflows
+    mkdir -p .github/workflows
     ```
 
 - 5.3. Dentro do diretório `.github/workflows`, crie o arquivo `popcorn-ci-build.yaml` com o seguinte conteúdo:
@@ -1825,9 +1825,6 @@ spec:
 
     # aplica o plugin
     stk apply plugin ../popcorn-studio/popcorn-ci-pipeline-plugin
-
-    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
-    ./mvnw clean test
     ```
 
 - 5.5. Certifique-se que o resultado final do diretório `templates` do nosso plugin deve ser semelhante a este:
@@ -1839,17 +1836,17 @@ spec:
             └── popcorn-ci-build.yaml
     ```
 
-6. Agora, vamos publicar e consumir o plugin `popcorn-ci-pipeline-plugin` no estúdio da nossa conta da StackSpot. Siga os passos:
+6. Agora, vamos publicar e consumir o plugin `popcorn-ci-pipeline-plugin` no estúdio da nossa conta da StackSpot. Como de costume, siga os passos:
 
 - 6.1. Publique o plugin no estúdio `popcorn-studio`;
 - 6.2. Configure a Stack com este novo plugin;
 - 6.3. Adicione este plugin nos Starters existentes (neste caso, a ordem do plugin não importa);
-- 6.4. Adicione a Stack a nossa Workspace;
+- 6.4. Adicione a a nova versão da Stack a nossa Workspace;
 - 6.5. Configure os inputs padrão de cada plugin como você entender que faz sentido;
 - 6.6. Configure a action e workflow de criação de repositórios;
 - 6.7. Agora, crie uma aplicação usando nossa Stack e Starter (preferencialmente o Starter que se integra com banco de dados);
-- 6.8. Dentro do repositório do projeto, acesse a aba *Actions* e verifique a pipeline rodando via Github Actions;
-- 6.9. Aceita a Pull Request (PR) e veja no job do Github Actions rodando novamente, mas desta vez na branch `main`;
+- 6.8. Após a criação do repositório da aplicação, acesse o repositório, em seguida acesse a aba *Actions* e verifique a pipeline rodando via Github Actions;
+- 6.9. Aceite a Pull Request (PR) e veja o job do Github Actions rodando novamente, mas desta vez na branch `main`;
 - 6.10. Por fim, faça o clone do repositório criado, rode o build e bateria de testes via Maven e, se desejar, importe o projeto na sua IDE favorita e comece o desenvolvimento do seu microsserviço 🥳;
 
 7. 🚀 **(opcional)** Melhore a DevEx (Developer Experience) da nossa Stack permitindo que o plugin de pipeline de CI herde o input `project_java_version` do plugin base;
