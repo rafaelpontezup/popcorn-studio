@@ -16,6 +16,8 @@ Estes são as atividades e exercicíos de cada módulo que iremos estudar e trei
 
 4. [Módulo 4: Habilitando capacidade de persistência em bancos de dados relacionais](#módulo-4-habilitando-capacidade-de-persistência-em-bancos-de-dados-relacionais)
 
+5. [Módulo 5: Habilitando capacidade de pipeline de integração contínua (CI)](#módulo-5-habilitando-capacidade-de-pipeline-de-integração-contínua-ci)
+
 
 ## Módulo 1: Introdução a StackSpot
 
@@ -1708,3 +1710,146 @@ spec:
 - 9.11. Se desejar, importe o projeto na sua IDE favorite e comece o desenvolvimento do seu microsserviço 🥳
 
 10. 🚀 **(opcional)** Melhore o nosso plugin de persistência adicionando suporte ao banco MySQL 8.x.
+
+## Módulo 5: Habilitando capacidade de pipeline de integração contínua (CI)
+
+Neste módulo criaremos um novo plugin para habilitar o suporte a pipeline de integração contínua (CI) através do Github Actions: compilar, rodar bateria de testes e empacotar nossa aplicação em um arquivo JAR. Por se tratar do ecossistema Java com Spring Boot, tiraremos proveito dos recursos de build do Maven.
+
+### Exercícios
+
+1. Primeiramente, dentro do diretório do nosso estúdio `popcorn-studio`, crie um novo plugin com o nome `popcorn-ci-pipeline-plugin` com o comando a abaixo e responda as questões solicitadas pela CLI:
+
+```sh
+stk create plugin popcorn-ci-pipeline-plugin
+```
+
+2. Ainda dentro do diretório do estúdio, abra-o com seu editor de texto preferido. Se estiver utilizando o **Visual Studio Code (VsCode)**, basta executar o comando abaixo dentro do diretório:
+
+```sh
+code .
+```
+
+3. Agora vamos fazer as configurações básicas do nosso plugin. Para isso, dentro do diretório `popcorn-ci-pipeline-plugin`, abra o arquivo `plugin.yaml` e edite os atributos `display-name`, `description` e `technologies` como abaixo:
+
+```yaml
+metadata:
+  display-name: CI Pipeline plugin
+  description: Habilita suporte a pipeline de CI com Github Actions
+
+# ...
+
+spec:
+    # ...
+    technologies:
+        - Api
+        - Java
+        - Maven
+```
+
+4. Ainda no arquivo `plugin.yaml`, vamos adicionar os inputs para perguntar ao usuário qual banco de dados será utilizado e qual pacote base (*base package*) utilizado no projeto. Dessa forma, siga os passos:
+
+- 4.1. Adicione um input para solicitar a versão do Java (este input será utilizado para configurar o Maven na pipeline):
+
+    ```yaml
+    inputs:
+        - label: Qual a versão do Java utilizada pela aplicação?
+          name: project_java_version
+          type: text
+          items:
+            - "17"
+            - "21"
+          default: 17
+          required: true
+          help: 'Informe a versão do Java utilizada ou compatível com a aplicação'
+    ```
+
+- 4.2. Lembre-se de validar seu arquivo `plugin.yaml` com o comando abaixo:
+
+    ```sh
+    # dentro do diretorio do plugin
+    stk validate plugin
+    ```
+
+5. Agora vamos configurar a estrutura do diretório de templates (`templates`) com o descritor de pipeline do Github Actions. Para isso, siga os passos:
+
+- 5.1. Apague o arquivo `README.md` existente;
+
+- 5.2. Crie a hierarquia de diretório `.github/workflows`. Perceba que o diretório é oculto (prefixo `.`):
+
+    ```sh
+    # dentro do diretório "templates"
+    mkdir -o .github/workflows
+    ```
+
+- 5.3. Dentro do diretório `.github/workflows`, crie o arquivo `popcorn-ci-build.yaml` com o seguinte conteúdo:
+
+    ```yaml
+    name: Java CI with Maven
+
+    on:
+    push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
+
+    jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Set up JDK {{project_java_version}}
+              uses: actions/setup-java@v3
+              with:
+                java-version: '{{project_java_version}}'
+                distribution: 'temurin'
+                cache: maven
+        
+            - name: Build with Maven
+              run: mvn -B package --file pom.xml
+
+            - name: Prepare to upload application's JAR file 
+              run: mkdir staging && cp target/*.jar staging
+            
+            - name: Upload application's JAR file
+              uses: actions/upload-artifact@v3
+              with:
+                name: Package
+                path: staging
+    ```
+
+- 5.4. Agora, vamos resetar o conteúdo do diretório de teste (`popcorn-demo-teste`), aplicar nosso novo plugin de CI e ver o resultado:
+
+    ```sh
+    # reseta modificações do "porpcorn-demo-teste"
+    git reset --hard HEAD ; git clean -fd 
+
+    # aplica o plugin
+    stk apply plugin ../popcorn-studio/popcorn-ci-pipeline-plugin
+
+    # valida conteúdo com Maven: compilando código e rodando a bateria de testes
+    ./mvnw clean test
+    ```
+
+- 5.5. Certifique-se que o resultado final do diretório `templates` do nosso plugin deve ser semelhante a este:
+
+    ```sh
+    templates
+    └── .github
+        └── workflows
+            └── popcorn-ci-build.yaml
+    ```
+
+6. Agora, vamos publicar e consumir o plugin `popcorn-ci-pipeline-plugin` no estúdio da nossa conta da StackSpot. Siga os passos:
+
+- 6.1. Publique o plugin no estúdio `popcorn-studio`;
+- 6.2. Configure a Stack com este novo plugin;
+- 6.3. Adicione este plugin nos Starters existentes (neste caso, a ordem do plugin não importa);
+- 6.4. Adicione a Stack a nossa Workspace;
+- 6.5. Configure os inputs padrão de cada plugin como você entender que faz sentido;
+- 6.6. Configure a action e workflow de criação de repositórios;
+- 6.7. Agora, crie uma aplicação usando nossa Stack e Starter (preferencialmente o Starter que se integra com banco de dados);
+- 6.8. Dentro do repositório do projeto, acesse a aba *Actions* e verifique a pipeline rodando via Github Actions;
+- 6.9. Aceita a Pull Request (PR) e veja no job do Github Actions rodando novamente, mas desta vez na branch `main`;
+- 6.10. Por fim, faça o clone do repositório criado, rode o build e bateria de testes via Maven e, se desejar, importe o projeto na sua IDE favorita e comece o desenvolvimento do seu microsserviço 🥳;
+
+7. 🚀 **(opcional)** Melhore a DevEx (Developer Experience) da nossa Stack permitindo que o plugin de pipeline de CI herde o input `project_java_version` do plugin base;
