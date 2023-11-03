@@ -1669,15 +1669,23 @@ spec:
 
 9. Agora, para consumir nosso novo plugin, precisamos publicá-lo no nosso Studio, adiciona-lo na Stack e por fim adiciona-lo na nossa Workspace. Dessa forma, siga os passos abaixo:
 
-- 9.1. Na linha de comando e dentro do diretório do plugin (`popcorn-springboot-data-jpa-plugin`), publique o plugin no estúdio que criamos no portal da StackSpot:
+- 9.1. Precisamos publicar nosso plugin base (`popcorn-springboot-base-plugin`) no estúdio pois o mesmo foi modificado. Para isso, na linha da comando e dentro do diretório deste plugin, execute o comando a seguir:
 
     ```sh
+    # plugin "base-plugin"
     stk publish plugin --studio popcorn-studio
     ```
 
-- 9.2. Adicione o plugin na Stack existente;
+- 9.2. Ainda na linha de comando, mas desta vez dentro do diretório do novo plugin `popcorn-springboot-data-jpa-plugin`, publique o plugin no estúdio que criamos no portal da StackSpot:
 
-- 9.3. **Crie um novo Starter** semelhante ao anterior e **adicione nosso novo plugin**. Garanta que ele venha **depois** de todos os demais plugins;
+    ```sh
+    # plugin "data-jpa-plugin"
+    stk publish plugin --studio popcorn-studio
+    ```
+
+- 9.3. Adicione **ambos** os plugins na Stack existente;
+
+- 9.4. **Crie um novo Starter** semelhante ao anterior e **adicione nosso novo plugin**. Garanta que ele venha **depois** de todos os demais plugins;
 
 - 9.5. Adicione a nova versão da Stack a nossa Workspace;
 
