@@ -1156,7 +1156,7 @@ spec:
 
     > ⚠️ **Atenção**: Por estarmos modificando conteúdo de formato YAML, como `application.yaml` ou `application-test.yaml`, é muito importante ter uma atenção redobrada com a formatação e indentação do código YAML que será inserido ou alterado pelo plugin, especialmente em snippets de código que serão mergeados em arquivos existentes, grandes e complexos. Qualquer erro de indentação pode gerar erros no startup da aplicação ou, pior, ser ignorada silenciosamente pela aplicação como se nada tivesse acontecido.
 
-- 5.4. Agora faremos o mesmo para o arquivo de configuração de testes do Spring. Crie um novo arquivo de snippet com o nome `snippet-application.yaml.jinja` (atenção a indentação, quebras de linhas e código Jinja):
+- 5.4. Agora faremos o mesmo para o arquivo de configuração de testes do Spring. Crie um novo arquivo de snippet com o nome `snippet-application-test.yaml.jinja` (atenção a indentação, quebras de linhas e código Jinja):
 
     ```yaml
         ##
