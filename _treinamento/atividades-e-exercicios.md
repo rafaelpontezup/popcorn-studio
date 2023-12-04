@@ -1789,10 +1789,10 @@ spec:
     name: Java CI with Maven
 
     on:
-	push:
-		branches: [ "main" ]
-	pull_request:
-		branches: [ "main" ]
+	    push:
+	        branches: [ "main" ]
+	    pull_request:
+	        branches: [ "main" ]
 
     jobs:
 	    build:
