@@ -1789,34 +1789,34 @@ spec:
     name: Java CI with Maven
 
     on:
-    push:
-        branches: [ "main" ]
-    pull_request:
-        branches: [ "main" ]
+	    push:
+			branches: [ "main" ]
+		pull_request:
+			branches: [ "main" ]
 
     jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v3
-            - name: Set up JDK {{project_java_version}}
-              uses: actions/setup-java@v3
-              with:
-                java-version: '{{project_java_version}}'
-                distribution: 'temurin'
-                cache: maven
-        
-            - name: Build with Maven
-              run: mvn -B package --file pom.xml
-
-            - name: Prepare to upload application's JAR file 
-              run: mkdir staging && cp target/*.jar staging
-            
-            - name: Upload application's JAR file
-              uses: actions/upload-artifact@v3
-              with:
-                name: Package
-                path: staging
+	    build:
+	        runs-on: ubuntu-latest
+	        steps:
+	            - uses: actions/checkout@v3
+	            - name: Set up JDK {{project_java_version}}
+	              uses: actions/setup-java@v3
+	              with:
+	                java-version: '{{project_java_version}}'
+	                distribution: 'temurin'
+	                cache: maven
+	        
+	            - name: Build with Maven
+	              run: mvn -B package --file pom.xml
+	
+	            - name: Prepare to upload application's JAR file 
+	              run: mkdir staging && cp target/*.jar staging
+	            
+	            - name: Upload application's JAR file
+	              uses: actions/upload-artifact@v3
+	              with:
+	                name: Package
+	                path: staging
     ```
 
 - 5.4. Agora, vamos resetar o conteúdo do diretório de teste (`popcorn-demo-teste`), aplicar nosso novo plugin de CI e ver o resultado:
